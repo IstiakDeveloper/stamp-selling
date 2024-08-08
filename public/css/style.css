@@ -1,0 +1,42 @@
+body{
+    font-family: "Tiro Bangla", serif;
+}
+
+.bg-image-1{
+    background: url('/images/background-images/bg-image-1.jpg') no-repeat;
+    position: relative;
+    background-color: rgba(0, 0, 0, 0.6);
+    background-blend-mode: overlay;
+}
+.bg-image-2{
+    background: url("/images/background-images/bg-image-2.jpg") no-repeat;
+    position: relative;
+    background-color: rgb(6, 34, 93);
+    background-blend-mode: overlay;
+}
+.bg-image-3{
+    background: url("/images/background-images/bg-image-3.jpg") no-repeat;
+    position: relative;
+    background-color: rgb(28, 77, 180);
+    background-blend-mode: overlay;
+}
+.container{
+    max-width: 1100px !important;
+}
+
+footer .flex a:hover svg {
+    fill: white;
+}
+footer .flex a.active, footer .flex a.active svg{
+    fill: white;
+    background-color: rgb(249 115 22 / 1);
+}
+header nav .active{
+    text-decoration-line: underline;
+    text-underline-offset: 8px;
+}
+
+
+
+
+
