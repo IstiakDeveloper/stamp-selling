@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('head_office_sales', function (Blueprint $table) {
             $table->id();
             $table->date('date');
-            $table->integer('sets');
+            $table->decimal('sets', 10, 5);
             $table->decimal('per_set_price', 15, 2);
             $table->decimal('total_price', 15, 2);
             $table->decimal('cash', 15, 2);

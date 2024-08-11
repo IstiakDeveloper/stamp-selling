@@ -13,8 +13,8 @@ return new class extends Migration
     {
         Schema::create('total_stocks', function (Blueprint $table) {
             $table->id();
-            $table->integer('total_sets')->default(0);
-            $table->integer('total_pieces')->default(0);
+            $table->decimal('total_sets', 10, 5)->default(0);
+            $table->decimal('total_pieces', 10, 5)->default(0);
             $table->timestamps();
         });
 

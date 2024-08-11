@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('branch_id')->nullable();
             $table->date('date');
-            $table->integer('sets');
+            $table->decimal('sets', 10, 5);
             $table->decimal('per_set_price', 15, 2);
             $table->decimal('total_price', 15, 2);
             $table->decimal('cash', 15, 2);

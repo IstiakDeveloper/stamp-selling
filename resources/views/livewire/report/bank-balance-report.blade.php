@@ -65,8 +65,13 @@
                         </td>
                     </tr>
                 @endif
+            
                 @forelse ($data as $index => $entry)
-                    <tr>
+                    @php
+                        // Determine if any of the fields have a value
+                        $hasValue = !empty($entry['cash_receive']) || !empty($entry['purchase_sets']) || !empty($entry['purchase_price']) || !empty($entry['expenses']);
+                    @endphp
+                    <tr class="{{ $hasValue ? 'bg-gray-200' : '' }}">
                         <td class="px-6 py-4">{{ $index + 1 }}</td>
                         <td class="px-6 py-4">{{ $entry['date'] }}</td>
                         <td class="px-6 py-4">
@@ -91,8 +96,9 @@
                     </tr>
                 @endforelse
             </tbody>
+            
             <!-- Total Row -->
-            <tfoot class="bg-gray-200 text-gray-600 font-semibold">
+            <tfoot class="bg-gray-300 text-gray-600 font-semibold">
                 <tr>
                     <td colspan="2" class="px-6 py-3 text-left">Total</td>
                     <td class="px-6 py-3 text-left">

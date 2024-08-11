@@ -43,17 +43,20 @@
                 @foreach ($completeMonth as $day)
                     @php
                         $sale = $sales->firstWhere('date', $day->format('Y-m-d'));
+                        // Check if any of the fields have values
+                        $hasValue = !empty($sale['sets']) || !empty($sale['set_price']) || !empty($sale['price']) || !empty($sale['cash']) || !empty($sale['due']);
                     @endphp
-                    <tr class="{{ $loop->odd ? 'bg-white' : 'bg-gray-50' }}">
+                    <tr class="{{ $hasValue ? 'bg-gray-100' : ($loop->odd ? 'bg-white' : '') }} border-b border-gray-300">
                         <td class="px-6 py-4 border-b border-gray-300">{{ $loop->iteration }}</td>
                         <td class="px-6 py-4 border-b border-gray-300">{{ $day->format('Y-m-d') }}</td>
                         <td class="px-6 py-4 border-b border-gray-300 text-right">{{ $sale['sets'] ?? 0 }}</td>
-                        <td class="px-6 py-4 border-b border-gray-300 text-right"> {{ number_format($sale['set_price'] ?? 0, 2) }}</td>
-                        <td class="px-6 py-4 border-b border-gray-300 text-right"> {{ number_format($sale['price'] ?? 0, 2) }}</td>
-                        <td class="px-6 py-4 border-b border-gray-300 text-right"> {{ number_format($sale['cash'] ?? 0, 2) }}</td>
-                        <td class="px-6 py-4 border-b border-gray-300 text-right"> {{ number_format($sale['due'] ?? 0, 2) }}</td>
+                        <td class="px-6 py-4 border-b border-gray-300 text-right">{{ number_format($sale['set_price'] ?? 0, 2) }}</td>
+                        <td class="px-6 py-4 border-b border-gray-300 text-right">{{ number_format($sale['price'] ?? 0, 2) }}</td>
+                        <td class="px-6 py-4 border-b border-gray-300 text-right">{{ number_format($sale['cash'] ?? 0, 2) }}</td>
+                        <td class="px-6 py-4 border-b border-gray-300 text-right">{{ number_format($sale['due'] ?? 0, 2) }}</td>
                     </tr>
                 @endforeach
+            
 
                 <tr class="bg-gray-200 font-bold">
                     <td class="px-6 py-4 border-t border-gray-300 text-right" colspan="3">Total</td>

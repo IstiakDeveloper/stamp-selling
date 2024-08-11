@@ -15,8 +15,8 @@ return new class extends Migration
             $table->id();
             $table->date('date');
             $table->string('address')->nullable();
-            $table->integer('sets');
-            $table->integer('pieces');
+            $table->decimal('sets', 10, 5);
+            $table->decimal('pieces', 10, 4);
             $table->decimal('price_per_set', 15, 2);
             $table->decimal('price_per_piece', 15, 2);
             $table->decimal('total_price', 15, 2);

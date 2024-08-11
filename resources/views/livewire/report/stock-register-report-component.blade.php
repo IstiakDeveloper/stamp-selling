@@ -79,13 +79,13 @@
                         <th class="w-1/4 px-6 py-3 text-right">Sets</th>
                         <th class="w-1/4 px-6 py-3 text-right">Price</th>
                         <th class="w-1/4 px-6 py-3 text-right">Total Price</th>
-                        <th class="w-1/4 px-6 py-3 text-right">Available Sets</th> <!-- New Column Header -->
+                        <th class="w-1/4 px-1 py-3 text-right">Available Sets</th> <!-- New Column Header -->
                     </tr>
                 </thead>
                 <tbody>
 
                     <tr class="bg-green-200 font-bold">
-                        <td class="px-6 py-4 border-b border-gray-300">Before {{ \Carbon\Carbon::createFromDate($selectedYear, $selectedMonth)->format('F') }}</td>
+                        <td class="px-2 py-4 border-b border-gray-300">Before {{ \Carbon\Carbon::createFromDate($selectedYear, $selectedMonth)->format('F') }}</td>
                         <td class="px-6 py-4 border-b border-gray-300 text-right">{{ number_format($soFarTotalStockOut, 2) }}</td>
                         <td class="px-6 py-4 border-b border-gray-300 text-right">{{ number_format($soFarAverageStockOutPrice, 2) }}</td>
                         <td class="px-6 py-4 border-b border-gray-300 text-right">{{ number_format($soFarTotalStockOutPrice, 2) }}</td>

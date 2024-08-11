@@ -11,7 +11,7 @@
                     @endfor
                 </select>
             </div>
-
+            
             <div class="mb-6">
                 <label for="year" class="block text-sm font-medium text-gray-700">Year:</label>
                 <select id="year" wire:model.live="year" class="form-select mt-1 block w-full py-2 px-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
@@ -136,8 +136,8 @@
             </table>
         </div>
         <div class="mt-4">
-            <button wire:click="exportCSV" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4">Download CSV</button>
-            <button wire:click="exportPDF" class="bg-green-500 text-white px-4 py-2 rounded">Export PDF</button>
+            {{-- <button wire:click="exportCSV" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4">Download CSV</button> --}}
+            <button wire:click="exportPDF" class="bg-blue-500 text-white px-4 py-2 rounded">Download PDF</button>
         </div>
     </div>
 

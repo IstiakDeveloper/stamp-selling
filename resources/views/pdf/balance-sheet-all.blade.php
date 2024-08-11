@@ -51,15 +51,15 @@
                 <tbody>
                     <tr>
                         <td>Funds</td>
-                        <td>BDT: {{ number_format($totalCashIn, 2) }}</td>
+                        <td> {{ number_format($totalCashIn, 2) }}</td>
                     </tr>
                     <tr>
                         <td>Net Profit</td>
-                        <td>BDT: {{ number_format($netProfit, 2) }}</td>
+                        <td> {{ number_format($netProfit, 2) }}</td>
                     </tr>
                     <tr class="total">
                         <td>Total</td>
-                        <td>BDT: {{ number_format($totalCashIn + $netProfit, 2) }}</td>
+                        <td> {{ number_format($totalCashIn + $netProfit, 2) }}</td>
                     </tr>
                 </tbody>
             </table>
@@ -75,19 +75,19 @@
                 <tbody>
                     <tr>
                         <td>Total Bank or Hand Balance</td>
-                        <td>BDT: {{ number_format($totalBankOrHandBalance, 2) }}</td>
+                        <td> {{ number_format($totalBankOrHandBalance, 2) }}</td>
                     </tr>
                     <tr>
                         <td>So Far Branch Outstanding</td>
-                        <td>BDT: {{ number_format($outstandingTotal, 2) }}</td>
+                        <td> {{ number_format($outstandingTotal, 2) }}</td>
                     </tr>
                     <tr>
                         <td>Stock Stamp Buy Price</td>
-                        <td>BDT: {{ number_format($stockStampBuyPrice, 2) }}</td>
+                        <td> {{ number_format($stockStampBuyPrice, 2) }}</td>
                     </tr>
                     <tr class="total">
                         <td>Total</td>
-                        <td>BDT: {{ number_format($outstandingTotal + $totalBankOrHandBalance + $stockStampBuyPrice, 2) }}</td>
+                        <td> {{ number_format($outstandingTotal + $totalBankOrHandBalance + $stockStampBuyPrice, 2) }}</td>
                     </tr>
                 </tbody>
             </table>

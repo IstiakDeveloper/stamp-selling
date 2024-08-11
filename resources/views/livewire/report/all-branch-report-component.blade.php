@@ -25,7 +25,11 @@
             </thead>
             <tbody>
                 @forelse($reportData as $data)
-                    <tr class="{{ $loop->odd ? 'bg-white' : 'bg-gray-50' }} border-b border-gray-200">
+                    @php
+                        // Determine if any of the fields have a value
+                        $hasValue = !empty($data['sets']) || !empty($data['price']) || !empty($data['cash']);
+                    @endphp
+                    <tr class="{{ $hasValue ? 'bg-gray-100' : ($loop->odd ? 'bg-white' : '') }} border-b border-gray-200">
                         <td class="px-6 py-4 text-sm text-gray-900">{{ $loop->iteration }}</td>
                         <td class="px-6 py-4 text-sm text-gray-900 text-center">{{ $data['branch_name'] }}</td>
                         <td class="px-6 py-4 text-sm text-gray-900 text-center">{{ $data['sets'] }}</td>
@@ -34,13 +38,11 @@
                         <td class="px-6 py-4 text-sm text-gray-900 text-center">{{ $data['total_due'] }}</td>
                     </tr>
                 @empty
-                    <!-- Show this row if no data is available for the selected period but display overall totals -->
                     <tr>
-                        <td colspan="6" class="px-6 py-4 text-center text-sm text-gray-500">
-                            No sales data available for the selected period. Showing all data.
-                        </td>
+                        <td colspan="6" class="px-6 py-4 text-center text-gray-900">No data available</td>
                     </tr>
                 @endforelse
+            
 
                 <!-- Total Row -->
                 <tr class="bg-gray-200 font-bold border-t border-gray-300">

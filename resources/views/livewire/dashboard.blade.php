@@ -15,7 +15,7 @@
     </div>
 
     <!-- Filter Section -->
-    <div class="mb-2">
+    <div class="mb-2 hidden">
         <form class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-6 p-4 bg-white-d shadow rounded-lg">
             <div class="flex flex-col">
                 <select wire:model.live="selectedYear" id="year" class="p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">

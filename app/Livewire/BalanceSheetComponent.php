@@ -166,11 +166,42 @@ class BalanceSheetComponent extends Component
         return new StreamedResponse($callback, 200, $headers);
     }
 
+
+
+    public function render()
+    {
+        $values = $this->calculateValues();
+
+        return view('livewire.balance-sheet-component', [
+            'rejectOrFreeSumMonth' => $values['rejectOrFreeSumMonth'],
+            'rejectOrFreeSumYear' => $values['rejectOrFreeSumYear'],
+            'expenseSumMonth' => $values['expenseSumMonth'],
+            'expenseSumYear' => $values['expenseSumYear'],
+            'branchSalePriceSumMonth' => $values['branchSalePriceSumMonth'],
+            'branchSalePriceSumYear' => $values['branchSalePriceSumYear'],
+            'headOfficeSalePriceSumMonth' => $values['headOfficeSalePriceSumMonth'],
+            'headOfficeSalePriceSumYear' => $values['headOfficeSalePriceSumYear'],
+            'saleStampBuyPriceMonth' => $values['saleStampBuyPriceMonth'],
+            'saleStampBuyPriceYear' => $values['saleStampBuyPriceYear'],
+            'totalLossMonth' => $values['totalLossMonth'],
+            'totalLossYear' => $values['totalLossYear'],
+            'totalRevenueMonth' => $values['totalRevenueMonth'],
+            'totalRevenueYear' => $values['totalRevenueYear'],
+            'netProfitMonth' => $values['netProfitMonth'],
+            'netProfitYear' => $values['netProfitYear'],
+            'sofarNetProfitSumMonth' => $values['sofarNetProfitSumMonth'],
+            'sofarNetProfitSumYear' => $values['sofarNetProfitSumYear'],
+        ]);
+    }
+
+
     public function exportPDF()
     {
         $values = $this->calculateValues();
 
         $data = [
+            'year' => $this->year, 
+            'month' => $this->month, 
             'rejectOrFreeSumMonth' => $values['rejectOrFreeSumMonth'],
             'rejectOrFreeSumYear' => $values['rejectOrFreeSumYear'],
             'expenseSumMonth' => $values['expenseSumMonth'],
@@ -197,31 +228,5 @@ class BalanceSheetComponent extends Component
             fn() => print($pdf->output()), 
             'balance_sheet_' . $this->year . '_' . $this->month . '.pdf'
         );
-    }
-
-    public function render()
-    {
-        $values = $this->calculateValues();
-
-        return view('livewire.balance-sheet-component', [
-            'rejectOrFreeSumMonth' => $values['rejectOrFreeSumMonth'],
-            'rejectOrFreeSumYear' => $values['rejectOrFreeSumYear'],
-            'expenseSumMonth' => $values['expenseSumMonth'],
-            'expenseSumYear' => $values['expenseSumYear'],
-            'branchSalePriceSumMonth' => $values['branchSalePriceSumMonth'],
-            'branchSalePriceSumYear' => $values['branchSalePriceSumYear'],
-            'headOfficeSalePriceSumMonth' => $values['headOfficeSalePriceSumMonth'],
-            'headOfficeSalePriceSumYear' => $values['headOfficeSalePriceSumYear'],
-            'saleStampBuyPriceMonth' => $values['saleStampBuyPriceMonth'],
-            'saleStampBuyPriceYear' => $values['saleStampBuyPriceYear'],
-            'totalLossMonth' => $values['totalLossMonth'],
-            'totalLossYear' => $values['totalLossYear'],
-            'totalRevenueMonth' => $values['totalRevenueMonth'],
-            'totalRevenueYear' => $values['totalRevenueYear'],
-            'netProfitMonth' => $values['netProfitMonth'],
-            'netProfitYear' => $values['netProfitYear'],
-            'sofarNetProfitSumMonth' => $values['sofarNetProfitSumMonth'],
-            'sofarNetProfitSumYear' => $values['sofarNetProfitSumYear'],
-        ]);
     }
 }

@@ -11,6 +11,7 @@ use App\Models\HeadOfficeSale;
 use App\Models\Money;
 use App\Models\Payment;
 use App\Models\RejectOrFree;
+use App\Models\SofarNetProfit;
 use App\Models\Stock;
 use App\Models\TotalStock;
 use Livewire\Component;
@@ -117,6 +118,7 @@ class Dashboard extends Component
         $saleStampBuyAmount = $this->averageStampPricePerSet * $totalSaleSets;
 
         $this->totalStampAvailable = TotalStock::sum('total_sets');
+        $soFarNetProfitAmount = SofarNetProfit::sum('amount');
 
         $this->totalExpences = $expenseQuery->sum('amount');
         $totalRejectFreeSets = $rejectOrFreeQuery->sum('sets');
@@ -125,7 +127,7 @@ class Dashboard extends Component
         $this->netExpences = $this->totalExpences + $this->totalRejectFreePrice;
 
 
-        $this->totalProfit = $this->totalSaleAmount - $this->netExpences - $saleStampBuyAmount;
+        $this->totalProfit = $this->totalSaleAmount - $this->netExpences - $saleStampBuyAmount + $soFarNetProfitAmount;
 
         // Calculate outstanding balance after sales
         $branchOutstandingAfterSales = BranchSaleOutstanding::sum('outstanding_balance') - BranchSaleOutstanding::sum('extra_money');

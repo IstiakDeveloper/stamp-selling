@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('reject_or_frees', function (Blueprint $table) {
             $table->id();
             $table->date('date');
-            $table->integer('sets');
+            $table->decimal('sets', 10, 5);
             $table->decimal('purchase_price_per_set', 15, 2);
             $table->decimal('purchase_price_total', 15, 2);
             $table->text('note')->nullable();
