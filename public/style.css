@@ -738,7 +738,7 @@ main .recent-orders a{
 
 .dropdown-content.active {
     display: block;
-    max-height: 500px; /* Adjust as needed */
+    max-height: 1000px; /* Adjust as needed */
 }
 
 .rotate-180 {

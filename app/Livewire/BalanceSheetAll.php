@@ -7,21 +7,19 @@ use App\Models\Branch;
 use App\Models\BranchSale;
 use App\Models\BranchSaleOutstanding;
 use App\Models\Expense;
+use App\Models\FundManagement;
 use App\Models\HeadOfficeSale;
 use App\Models\Money;
-use App\Models\Payment;
 use App\Models\RejectOrFree;
+use App\Models\SofarNetProfit;
 use App\Models\Stock;
+use App\Models\TotalFund;
 use App\Models\TotalStock;
 use Barryvdh\DomPDF\Facade\Pdf;
-use Carbon\Carbon;
-use DateTime;
 use Livewire\Component;
 
 class BalanceSheetAll extends Component
 {
-    public $month;
-    public $year;
     public $totalCashIn;
     public $cashWas;
     public $soFarCash;
@@ -33,35 +31,19 @@ class BalanceSheetAll extends Component
 
     public function mount()
     {
-        $this->month = Carbon::now()->format('m');
-        $this->year = Carbon::now()->format('Y');
-        $this->generateReport();
-    }
-
-    public function updated($propertyName)
-    {
         $this->generateReport();
     }
 
     private function generateReport()
     {
         // Calculate total cash in and cash out
-        $totalCashIn = Money::where('type', 'cash_in')
-            ->whereYear('date', $this->year)
-            ->whereMonth('date', $this->month)
-            ->sum('amount');
+        $totalCashIn = TotalFund::get()->sum('total_fund');
         $totalCashOut = Money::where('type', 'cash_out')
-            ->whereYear('date', $this->year)
-            ->whereMonth('date', $this->month)
             ->sum('amount');
         $this->totalCashIn = $totalCashIn - $totalCashOut;
 
         // Calculate after-sale outstanding
-        $afterSaleOutstanding = BranchSaleOutstanding::whereYear('date', $this->year)
-            ->whereMonth('date', $this->month)
-            ->sum('outstanding_balance') - BranchSaleOutstanding::whereYear('date', $this->year)
-            ->whereMonth('date', $this->month)
-            ->sum('extra_money');
+        $afterSaleOutstanding = BranchSaleOutstanding::sum('outstanding_balance') - BranchSaleOutstanding::sum('extra_money');
 
         // Total outstanding balance and cash was
         $this->totalOutstandingBalance = Branch::sum('outstanding_balance');
@@ -85,7 +67,7 @@ class BalanceSheetAll extends Component
         // Calculate total reject or free
         $totalRejectOrFreeSets = RejectOrFree::sum('sets');
         $totalRejectOrFree = $totalRejectOrFreeSets * $averageStampPricePerSet;
- 
+
         // Calculate total set sale price
         $totalBranchSaleSets = BranchSale::sum('sets');
         $totalHeadOfficeSaleSets = HeadOfficeSale::sum('sets');
@@ -100,13 +82,15 @@ class BalanceSheetAll extends Component
         // Calculate total sale
         $totalSale = $totalBranchSalePrice + $totalHeadOfficeSalePrice;
 
+        // Fetch soFarNetProfit amount
+        $soFarNetProfitAmount = SofarNetProfit::sum('amount');
+
         // Calculate net profit
-        $netProfit = $totalSale - $totalLose;
+        $netProfit = $totalSale - $totalLose + $soFarNetProfitAmount;
 
         // Set net profit to class property if needed
         $this->netProfit = $netProfit;
     }
-
 
     public function downloadPdf()
     {
@@ -118,24 +102,20 @@ class BalanceSheetAll extends Component
             'stockStampBuyPrice' => $this->stockStampBuyPrice,
             'outstandingTotal' => $this->outstandingTotal,
             'netProfit' => $this->netProfit,
-            'month' => DateTime::createFromFormat('!m', $this->month)->format('F'),
-            'year' => $this->year,
+            'month' => 'All Time',
+            'year' => '',
         ];
-    
+
         $pdf = Pdf::loadView('pdf.balance-sheet-all', $data);
-    
+
         return response()->streamDownload(
             fn() => print($pdf->output()),
             'balance-sheet-all.pdf'
         );
     }
-    
 
     public function render()
     {
-        return view('livewire.balance-sheet-all', [
-            'years' => range(2020, now()->year),
-            'months' => range(1, 12),
-        ]);
+        return view('livewire.balance-sheet-all');
     }
 }

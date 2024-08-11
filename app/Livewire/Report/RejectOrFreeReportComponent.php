@@ -3,67 +3,106 @@
 namespace App\Livewire\Report;
 
 use App\Models\RejectOrFree;
+use App\Models\Stock;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use Livewire\Component;
 
 class RejectOrFreeReportComponent extends Component
 {
-    public $year;
-    public $month;
-    public $rejectOrFreeData;
-    public $totalSets;
-    public $totalPurchasePrice;
-    public $monthNameYear;
-
+    public $currentMonth;
+    public $currentYear;
+    public $previousMonthNetLoss;
+    public $rejectOrFreeRecords;
 
     public function mount()
     {
-        $this->year = now()->year;
-        $this->month = now()->month;
+        // Set default values for current month and year
+        $this->currentMonth = now()->month;
+        $this->currentYear = now()->year;
+
+        // Calculate the net loss for the previous month
+        $this->previousMonthNetLoss = $this->calculatePreviousMonthNetLoss($this->currentMonth, $this->currentYear);
+
+        // Fetch records for the current month and year
+        $this->fetchRecords();
     }
 
-    public function updated($propertyName)
+    public function calculatePreviousMonthNetLoss($selectedMonth, $selectedYear)
     {
-        if ($this->year && $this->month) {
-            $this->generateReport();
-        }
+        // Get the last day of the previous month
+        $endDate = Carbon::create($selectedYear, $selectedMonth, 1)->subDay();
+
+        // Get the cumulative net loss up to the end of the previous month
+        $previousNetLoss = RejectOrFree::whereDate('date', '<=', $endDate)
+                            ->sum('purchase_price_total');
+
+        return $previousNetLoss;
     }
 
-    public function generateReport()
+    public function fetchRecords()
     {
-        // Get reject or free data for the selected month
-        $this->rejectOrFreeData = RejectOrFree::whereYear('date', $this->year)
-                            ->whereMonth('date', $this->month)
-                            ->get();
-
-        // Calculate totals
-        $this->totalSets = $this->rejectOrFreeData->sum('sets');
-        $this->totalPurchasePrice = $this->rejectOrFreeData->sum('purchase_price_total');
-
-        // Format month and year
-        $this->monthNameYear = Carbon::createFromDate($this->year, $this->month, 1)->format('F Y');
+        $this->rejectOrFreeRecords = RejectOrFree::whereMonth('date', $this->currentMonth)
+                                ->whereYear('date', $this->currentYear)
+                                ->get();
     }
 
-    public function downloadPdf()
+    public function updated($field)
     {
-        $data = [
-            'rejectOrFreeData' => $this->rejectOrFreeData,
-            'totalSets' => $this->totalSets,
-            'totalPurchasePrice' => $this->totalPurchasePrice,
-            'monthYear' => $this->monthNameYear
-        ];
-
-        $pdf = Pdf::loadView('pdf.reject-or-free-report', $data);
-
-        return response()->streamDownload(
-            fn() => print($pdf->output()), 
-            'reject-or-free-report-' . $this->monthNameYear . '.pdf'
-        );
+        // Recalculate when the month or year is changed
+        $this->previousMonthNetLoss = $this->calculatePreviousMonthNetLoss($this->currentMonth, $this->currentYear);
+        $this->fetchRecords();
     }
 
     public function render()
     {
-        return view('livewire.report.reject-or-free-report-component');
+        $totalSetsBuy = Stock::sum('sets');
+        $totalSetsBuyPrice = Stock::sum('total_price');
+
+        if ($totalSetsBuy > 0) {
+            $averageStampPricePerSet = $totalSetsBuyPrice / $totalSetsBuy;
+        } else {
+            $averageStampPricePerSet = 0;
+        }
+
+        return view('livewire.report.reject-or-free-report-component', [
+            'averageStampPricePerSet' => $averageStampPricePerSet,
+            'totalSetsBuy' => $totalSetsBuy,
+            'totalSetsBuyPrice' => $totalSetsBuyPrice,
+        ]);
+    }
+
+    public function downloadPDF()
+    {
+        $pdf = Pdf::loadView('pdf.reject-or-free-report', [
+            'rejectOrFreeRecords' => $this->rejectOrFreeRecords,
+            'averageStampPricePerSet' => $this->getAverageStampPricePerSet(),
+            'previousMonthNetLoss' => $this->previousMonthNetLoss,
+            'currentMonth' => $this->currentMonth,
+            'currentYear' => $this->currentYear,
+        ]);
+
+        return response()->stream(
+            function () use ($pdf) {
+                echo $pdf->output();
+            },
+            200,
+            [
+                'Content-Type' => 'application/pdf',
+                'Content-Disposition' => 'attachment; filename="reject-or-free-report-' . $this->currentYear . '-' . str_pad($this->currentMonth, 2, '0', STR_PAD_LEFT) . '.pdf"',
+            ]
+        );
+    }
+
+    private function getAverageStampPricePerSet()
+    {
+        $totalSetsBuy = Stock::sum('sets');
+        $totalSetsBuyPrice = Stock::sum('total_price');
+
+        if ($totalSetsBuy > 0) {
+            return $totalSetsBuyPrice / $totalSetsBuy;
+        }
+
+        return 0;
     }
 }

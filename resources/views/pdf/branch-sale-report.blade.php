@@ -5,70 +5,85 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Branch Sale Report</title>
     <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
         table {
             width: 100%;
             border-collapse: collapse;
-        }
-        table, th, td {
-            border: 1px solid black;
+            margin-top: 20px;
         }
         th, td {
-            padding: 8px;
+            border: 1px solid #dddddd;
             text-align: left;
+            padding: 8px;
         }
-        .total-summary {
-            margin-bottom: 20px;
+        th {
+            background-color: #f2f2f2;
         }
-        .branch-top {
-            display: flex;
-            justify-content: space-between; /* Distributes space between items */
-            align-items: flex-start; /* Align items to the start of the flex container */
-            margin-bottom: 20px;
+        .text-right {
+            text-align: right;
         }
-        .branch-top > div {
-            width: 48%; /* Adjust width to fit the page, keeping space for margins */
+        .font-bold {
+            font-weight: bold;
+        }
+        .bg-gray-100 {
+            background-color: #f9f9f9;
+        }
+        .bg-gray-200 {
+            background-color: #f2f2f2;
         }
     </style>
 </head>
 <body>
     <h1>Branch Sale Report</h1>
-    <div class="branch-top">
-        <div>
-            <p><strong>Branch:</strong> {{ $branchName }}</p>
-            <p>{{ $monthYear }}</p>
-            <p>Outstanding Balance for Last Month: BDT: {{ number_format($outstandingBalance, 2) }}</p>
-        </div>
-    
-        <div class="total-summary">
-            <p>Total Sets: {{ $totalSets }}</p>
-            <p>Total Price: BDT: {{ number_format($totalPrice, 2) }}</p>
-            <p>Total Cash Received: BDT: {{ number_format($totalCash, 2) }}</p>
-            <p>Total Due: BDT: {{ number_format($totalDue, 2) }}</p>
-        </div>
-    </div>
+    <p><strong>Branch:</strong> {{ $branchName }}</p>
+    <p><strong>From Date:</strong> {{ $fromDate ?? 'No date specified' }}</p>
+    <p><strong>To Date:</strong> {{ $toDate ?? 'No date specified' }}</p>
 
     <table>
         <thead>
             <tr>
+                <th>Serial Number</th>
                 <th>Date</th>
                 <th>Sets</th>
-                <th>Per Set Price</th>
-                <th>Total Price</th>
-                <th>Cash Received</th>
+                <th>Price</th>
+                <th>Receive Cash</th>
                 <th>Due</th>
+                <th>Total Due</th>
             </tr>
         </thead>
         <tbody>
-            @foreach($sales as $sale)
-                <tr>
-                    <td>{{ $sale->date }}</td>
+            <tr>
+                <td colspan="6">Outstanding balance before {{ $fromDate ?? 'the selected period' }} was</td>
+                <td class="text-right">{{ number_format($soFarOutstanding, 2) }}</td>
+            </tr>
+
+            @forelse ($sales as $sale)
+                <tr class="{{ $loop->odd ? 'bg-gray-100' : '' }}">
+                    <td>{{ $loop->iteration }}</td> <!-- Serial Number -->
+                    <td>{{ \Carbon\Carbon::parse($sale->date)->format('Y-m-d') }}</td>
                     <td>{{ $sale->sets }}</td>
-                    <td>BDT: {{ $sale->per_set_price }}</td>
-                    <td>BDT: {{ $sale->total_price }}</td>
-                    <td>BDT: {{ $sale->cash }}</td>
-                    <td>BDT: {{ $sale->total_price - $sale->cash }}</td>
+                    <td>{{ number_format($sale->total_price, 2) }}</td>
+                    <td>{{ number_format($sale->cash, 2) }}</td>
+                    <td class="text-right">{{ number_format($sale->total_price - $sale->cash, 2) }}</td>
+                    <td class="text-right">{{ number_format($sale->total_due, 2) }}</td>
                 </tr>
-            @endforeach
+            @empty
+                <tr>
+                    <td colspan="7" class="text-center">No sales data available for the selected period.</td>
+                </tr>
+            @endforelse
+
+            <tr class="bg-gray-200 font-bold">
+                <td colspan="2" class="text-right">Total</td>
+                <td class="text-right">{{ $totalSets }}</td>
+                <td class="text-right">{{ number_format($totalPrice, 2) }}</td>
+                <td class="text-right">{{ number_format($totalCash, 2) }}</td>
+                <td class="text-right">{{ number_format(max($totalPrice - $totalCash, 0), 2) }}</td>
+                <td class="text-right">{{ number_format($totalDue, 2) }}</td>
+            </tr>
         </tbody>
     </table>
 </body>

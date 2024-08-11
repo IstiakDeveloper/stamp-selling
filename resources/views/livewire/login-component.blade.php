@@ -14,8 +14,12 @@
                 @error('password') <span class="text-red-600 text-sm">{{ $message }}</span> @enderror
             </div>
             <div class="flex items-center justify-between">
-                <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
-                    Login
+                <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline relative">
+                    <span wire:target="login">Login</span>
+                    <svg wire:loading wire:target="login" class="animate-spin h-5 w-5  text-white absolute right-3 top-1.5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v3.6a4.4 4.4 0 00-4.4 4.4H4z"></path>
+                    </svg>
                 </button>
             </div>
         </form>

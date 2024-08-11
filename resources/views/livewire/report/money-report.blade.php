@@ -26,7 +26,7 @@
     </div>
 
     <div class="mb-4">
-        <h3 class="text-lg font-medium text-gray-700">Opening Balance: ৳{{ number_format($openingBalance, 2) }}</h3>
+        <h3 class="text-lg font-medium text-gray-700">Opening Balance: {{ number_format($openingBalance, 2) }}</h3>
     </div>
 
     <div class="overflow-x-auto">
@@ -43,7 +43,7 @@
                 @foreach($transactions as $transaction)
                     <tr>
                         <td class="py-2 px-4 border-b border-gray-200">{{ $transaction->date }}</td>
-                        <td class="py-2 px-4 border-b border-gray-200">৳{{ $transaction->amount }}</td>
+                        <td class="py-2 px-4 border-b border-gray-200">{{ $transaction->amount }}</td>
                         <td class="py-2 px-4 border-b border-gray-200">{{ $transaction->type }}</td>
                         <td class="py-2 px-4 border-b border-gray-200">{{ $transaction->details }}</td>
                     </tr>

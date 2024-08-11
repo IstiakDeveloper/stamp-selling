@@ -1,67 +1,72 @@
-<div class="p-6 bg-white shadow-lg rounded-lg">
-    <form wire:submit.prevent="generateReport" class="space-y-4">
-        <div class="flex gap-4 items-center">
-            <div class="p-2">
-                <select id="year" wire:model="year" class="mt-1 p-2 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-                    @foreach(range(date('Y'), date('Y') - 10) as $year)
-                        <option value="{{ $year }}">{{ $year }}</option>
-                    @endforeach
-                </select>
-            </div>
-            <div class="p-2">
-                <select id="month" wire:model="month" class="mt-1 p-2 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-                    <option value="all">All Months</option>
-                    @foreach(range(1, 12) as $m)
-                        <option value="{{ $m }}">{{ \Carbon\Carbon::create()->month($m)->format('F') }}</option>
-                    @endforeach
-                </select>
-            </div>
-            <button type="submit" class="bg-blue-600 text-white py-2 px-4 rounded-md shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                Generate Report
-            </button>
+<div class="p-6 bg-white rounded-lg shadow-md border border-gray-200">
+    <!-- Date and Year Selection -->
+    <div class="flex items-center gap-4">
+        <div class="mb-4">
+            <label for="month" class="block text-sm font-medium text-gray-700">Select Month:</label>
+            <select id="month" wire:model.live="selectedMonth" class="p-2 form-select mt-1 block w-full rounded-md border border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                @for ($m = 1; $m <= 12; $m++)
+                    <option value="{{ str_pad($m, 2, '0', STR_PAD_LEFT) }}">{{ date('F', mktime(0, 0, 0, $m, 1)) }}</option>
+                @endfor
+            </select>
         </div>
-    </form>
 
-    @if ($monthNameYear)
-        <div class="mt-6">
-            <h3 class="text-lg font-medium text-gray-900"><span class="text-blue-600">{{ $monthNameYear }}</span></h3>
+        <div class="mb-4">
+            <label for="year" class="block text-sm font-medium text-gray-700">Select Year:</label>
+            <select id="year" wire:model.live="selectedYear" class="p-2 form-select mt-1 block w-full rounded-md border border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                @for ($y = date('Y'); $y >= 2020; $y--)
+                    <option value="{{ $y }}">{{ $y }}</option>
+                @endfor
+            </select>
         </div>
-    @endif
+    </div>
 
-    @if ($sales)
-    <div class="mt-6 flex justify-between items-center bg-green-600 py-3 px-8 text-white">
-            <p class="text-white font-bold text-lg">Total Sets: <span>{{ $totalSets }}</span></p>
-            <p class="text-white font-bold text-lg">Total Price: <span>৳{{ number_format($totalPrice, 2) }}</span></p>
-            <p class="text-white font-bold text-lg">Total Cash Received: <span>৳{{ number_format($totalCash, 2) }}</span></p>
-        </div>
-        <div class="mt-6">
-            <table class="min-w-full bg-white border border-gray-200">
-                <thead class="bg-gray-100">
-                    <tr>
-                        <th class="px-6 py-3 border-b border-gray-200 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
-                        <th class="px-6 py-3 border-b border-gray-200 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Sets</th>
-                        <th class="px-6 py-3 border-b border-gray-200 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Per Set Price</th>
-                        <th class="px-6 py-3 border-b border-gray-200 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total Price</th>
-                        <th class="px-6 py-3 border-b border-gray-200 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cash Received</th>
+    <!-- Table -->
+    <div class="overflow-x-auto mt-6">
+        <table class="min-w-full bg-white border border-gray-300 rounded-lg shadow-md">
+            <thead class="bg-blue-600 text-white">
+                <tr>
+                    <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider border-b border-gray-300">Serial Number</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider border-b border-gray-300">Date</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider border-b border-gray-300">Sets</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider border-b border-gray-300">Set Price</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider border-b border-gray-300">Price</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider border-b border-gray-300">Cash Received</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider border-b border-gray-300">Due</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="bg-gray-100 font-bold">
+                    <td class="px-6 py-4 border-b border-gray-300" colspan="6"><strong>So far Due:</strong></td>
+                    <td class="px-6 py-4 border-b border-gray-300 text-right"><strong> {{ number_format($soFarDue, 2) }}</strong></td>
+                </tr>
+
+                @foreach ($completeMonth as $day)
+                    @php
+                        $sale = $sales->firstWhere('date', $day->format('Y-m-d'));
+                    @endphp
+                    <tr class="{{ $loop->odd ? 'bg-white' : 'bg-gray-50' }}">
+                        <td class="px-6 py-4 border-b border-gray-300">{{ $loop->iteration }}</td>
+                        <td class="px-6 py-4 border-b border-gray-300">{{ $day->format('Y-m-d') }}</td>
+                        <td class="px-6 py-4 border-b border-gray-300 text-right">{{ $sale['sets'] ?? 0 }}</td>
+                        <td class="px-6 py-4 border-b border-gray-300 text-right"> {{ number_format($sale['set_price'] ?? 0, 2) }}</td>
+                        <td class="px-6 py-4 border-b border-gray-300 text-right"> {{ number_format($sale['price'] ?? 0, 2) }}</td>
+                        <td class="px-6 py-4 border-b border-gray-300 text-right"> {{ number_format($sale['cash'] ?? 0, 2) }}</td>
+                        <td class="px-6 py-4 border-b border-gray-300 text-right"> {{ number_format($sale['due'] ?? 0, 2) }}</td>
                     </tr>
-                </thead>
-                <tbody class="bg-white divide-y divide-gray-200">
-                    @foreach($sales as $sale)
-                        <tr>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ $sale->date }}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ $sale->sets }}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">৳{{ $sale->per_set_price }}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">৳{{ $sale->total_price }}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">৳{{ $sale->cash }}</td>
-                        </tr>
-                    @endforeach
-                </tbody>
-            </table>
-            <button wire:click="downloadPdf" class="mt-4 bg-green-600 text-white py-2 px-4 rounded-md shadow-sm hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                Download PDF
-            </button>
-        </div>
-    @endif
+                @endforeach
 
+                <tr class="bg-gray-200 font-bold">
+                    <td class="px-6 py-4 border-t border-gray-300 text-right" colspan="3">Total</td>
+                    <td class="px-6 py-4 border-t border-gray-300 text-right"> {{ number_format($totalSetPrice, 2) }}</td>
+                    <td class="px-6 py-4 border-t border-gray-300 text-right"> {{ number_format($totalPrice, 2) }}</td>
+                    <td class="px-6 py-4 border-t border-gray-300 text-right"> {{ number_format($totalCashReceived, 2) }}</td>
+                    <td class="px-6 py-4 border-t border-gray-300 text-right"> {{ number_format($totalDue, 2) }}</td>
+                </tr>
 
+            </tbody>
+        </table>
+        <button wire:click="downloadPdf" class="mt-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+            Download PDF
+        </button>
+    </div>
 </div>

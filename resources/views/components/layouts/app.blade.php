@@ -9,10 +9,9 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/datepicker.min.js"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.css" rel="stylesheet" />
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="icon" type="image/png" href="{{ asset('favicon.png') }}">
-    <link href="https://fonts.googleapis.com/css2?family=Tiro+Bangla:ital@0;1&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Platypi:ital,wght@0,300..800;1,300..800&family=Raleway:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{asset('css/style.css')}}">
     <title>Stamp Selling | Admin Panel</title>
 </head>
@@ -52,29 +51,35 @@
                         </span>
                     </a>
                     <div id="report-content" class="dropdown-content {{ request()->is('money_report', 'purchase_report', 'branch_sale_report', 'ho_sale_report', 'reject_free_report', 'expense_report', 'branch_total_report', 'balance_sheet', 'expenditure_sheet') ? 'active' : '' }}">
+                        <a href="{{ route('fund_management_report') }}" class="block p-2 {{ request()->routeIs('fund_management_report') ? 'active' : '' }}">
+                            <span class="material-icons-sharp text-sm">
+                                {{ request()->routeIs('fund_management_report') ? 'radio_button_checked' : 'radio_button_unchecked' }}
+                            </span>
+                            Fund Report
+                        </a>
                         <a href="{{ route('money_report') }}" class="block p-2 {{ request()->routeIs('money_report') ? 'active' : '' }}">
                             <span class="material-icons-sharp text-sm">
                                 {{ request()->routeIs('money_report') ? 'radio_button_checked' : 'radio_button_unchecked' }}
                             </span>
-                            Funds Report
-                        </a>
-                        <a href="{{ route('purchase_report') }}" class="block p-2 {{ request()->routeIs('purchase_report') ? 'active' : '' }}">
-                            <span class="material-icons-sharp text-sm">
-                                {{ request()->routeIs('purchase_report') ? 'radio_button_checked' : 'radio_button_unchecked' }}
-                            </span>
-                            Purchase Report
+                            Money Report
                         </a>
                         <a href="{{ route('branch_sale_report') }}" class="block p-2 {{ request()->routeIs('branch_sale_report') ? 'active' : '' }}">
                             <span class="material-icons-sharp text-sm">
                                 {{ request()->routeIs('branch_sale_report') ? 'radio_button_checked' : 'radio_button_unchecked' }}
                             </span>
-                            Branch Sale Report
+                            Branch Report
+                        </a>
+                        <a href="{{ route('branch_total_report') }}" class="block p-2 {{ request()->routeIs('branch_total_report') ? 'active' : '' }}">
+                            <span class="material-icons-sharp text-sm">
+                                {{ request()->routeIs('branch_total_report') ? 'radio_button_checked' : 'radio_button_unchecked' }}
+                            </span>
+                            Branches Report
                         </a>
                         <a href="{{ route('ho_sale_report') }}" class="block p-2 {{ request()->routeIs('ho_sale_report') ? 'active' : '' }}">
                             <span class="material-icons-sharp text-sm">
                                 {{ request()->routeIs('ho_sale_report') ? 'radio_button_checked' : 'radio_button_unchecked' }}
                             </span>
-                            Head Office Sale Report
+                            HO Sale Report
                         </a>
                         <a href="{{ route('reject_free_report') }}" class="block p-2 {{ request()->routeIs('reject_free_report') ? 'active' : '' }}">
                             <span class="material-icons-sharp text-sm">
@@ -88,11 +93,23 @@
                             </span>
                             Expense Report
                         </a>
-                        <a href="{{ route('branch_total_report') }}" class="block p-2 {{ request()->routeIs('branch_total_report') ? 'active' : '' }}">
+                        <a href="{{ route('bank_balance_report') }}" class="block p-2 {{ request()->routeIs('bank_balance_report') ? 'active' : '' }}">
                             <span class="material-icons-sharp text-sm">
-                                {{ request()->routeIs('branch_total_report') ? 'radio_button_checked' : 'radio_button_unchecked' }}
+                                {{ request()->routeIs('bank_balance_report') ? 'radio_button_checked' : 'radio_button_unchecked' }}
                             </span>
-                            Branch Total Report
+                            Bank Balance Report
+                        </a>
+                        <a href="{{ route('stock_register_report') }}" class="block p-2 {{ request()->routeIs('stock_register_report') ? 'active' : '' }}">
+                            <span class="material-icons-sharp text-sm">
+                                {{ request()->routeIs('stock_register_report') ? 'radio_button_checked' : 'radio_button_unchecked' }}
+                            </span>
+                            Stock Register Report
+                        </a>
+                        <a href="{{ route('purchase_report') }}" class="block p-2 {{ request()->routeIs('purchase_report') ? 'active' : '' }}">
+                            <span class="material-icons-sharp text-sm">
+                                {{ request()->routeIs('purchase_report') ? 'radio_button_checked' : 'radio_button_unchecked' }}
+                            </span>
+                            Purchase Report
                         </a>
                         <a href="{{ route('expenditure_sheet') }}" class="block p-2 {{ request()->routeIs('expenditure_sheet') ? 'active' : '' }}">
                             <span class="material-icons-sharp text-sm">
@@ -100,29 +117,32 @@
                             </span>
                             Expenditure Sheet
                         </a>
-
-                        <a href="{{ route('transection_report') }}" class="block p-2 {{ request()->routeIs('transection_report') ? 'active' : '' }}">
+                        {{-- <a href="{{ route('transection_report') }}" class="block p-2 {{ request()->routeIs('transection_report') ? 'active' : '' }}">
                             <span class="material-icons-sharp text-sm">
                                 {{ request()->routeIs('transection_report') ? 'radio_button_checked' : 'radio_button_unchecked' }}
                             </span>
                             Transections Sheet
-                        </a>
-
+                        </a> --}}
                         <a href="{{ route('balance_sheet') }}" class="block p-2 {{ request()->routeIs('balance_sheet') ? 'active' : '' }}">
                             <span class="material-icons-sharp text-sm">
                                 {{ request()->routeIs('balance_sheet') ? 'radio_button_checked' : 'radio_button_unchecked' }}
                             </span>
                             Balance Sheet
                         </a>
-
                     </div>
-                </div>                
+                </div>
+                <a href="{{ route('fund_management') }}" class="{{ request()->routeIs('fund_management') ? 'active' : '' }}">
+                    <span class="material-icons-sharp">
+                        money
+                    </span>
+                    <h3>Fund Management</h3>
+                </a>
 
                 <a href="{{ route('money_manage') }}" class="{{ request()->routeIs('money_manage') ? 'active' : '' }}">
                     <span class="material-icons-sharp">
                         attach_money
                     </span>
-                    <h3>Money Management</h3>
+                    <h3>Balance Management</h3>
                 </a>
 
                 <a href="{{ route('stocks') }}" class="{{ request()->routeIs('stocks') ? 'active' : '' }}">
@@ -131,35 +151,35 @@
                     </span>
                     <h3>Purchase (Stock)</h3>
                 </a>
-                
+
                 <a href="{{ route('branches') }}" class="{{ request()->routeIs('branches') ? 'active' : '' }}">
                     <span class="material-icons-sharp">
                         location_city
                     </span>
                     <h3>Branches</h3>
                 </a>
-                
+
                 <a href="{{ route('set_price') }}" class="{{ request()->routeIs('set_price') ? 'active' : '' }}">
                     <span class="material-icons-sharp">
                         attach_money
                     </span>
                     <h3>Unit Price (Branch)</h3>
                 </a>
-                
+
                 <a href="{{ route('branch_sale') }}" class="{{ request()->routeIs('branch_sale') ? 'active' : '' }}">
                     <span class="material-icons-sharp">
                         local_grocery_store
                     </span>
                     <h3>Branch Management</h3>
                 </a>
-                
+
                 <a href="{{ route('office_sale') }}" class="{{ request()->routeIs('office_sale') ? 'active' : '' }}">
                     <span class="material-icons-sharp">
                         store
                     </span>
                     <h3>Head Office Sale</h3>
                 </a>
-                
+
                 <a href="{{ route('reject_free') }}" class="{{ request()->routeIs('reject_free') ? 'active' : '' }}">
                     <span class="material-icons-sharp">
                         delete
@@ -173,15 +193,15 @@
                     </span>
                     <h3>Expences</h3>
                 </a>
-                
-                {{-- <a href="{{ route('balance_sheet') }}" class="{{ request()->routeIs('balance_sheet') ? 'active' : '' }}">
+
+                <a href="{{ route('sofar-net-profit.index') }}" class="{{ request()->routeIs('sofar-net-profit.index') ? 'active' : '' }}">
                     <span class="material-icons-sharp">
                         account_balance
                     </span>
-                    <h3>Balance Sheet</h3>
-                </a> --}}
+                    <h3>Sofar Net Profit</h3>
+                </a>
 
-                
+
 
                 <a href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
                     <span class="material-icons-sharp">
@@ -200,14 +220,14 @@
         <main>
             <div class="right-section">
                 <div class="nav">
-     
+
                     <button id="menu-btn">
                         <span class="material-icons-sharp">
                             menu
                         </span>
                     </button>
 
-    
+
                     <div class="dark-mode">
                         <span class="material-icons-sharp active">
                             light_mode
@@ -217,7 +237,7 @@
                         </span>
                     </div>
                 </div>
-            </div>  
+            </div>
             {{ $slot }}
         </main>
         <!-- End of Main Content -->

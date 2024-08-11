@@ -43,6 +43,8 @@ class StockComponent extends Component
         $this->totalPcs = TotalStock::sum('total_pieces');
     }
 
+
+
     public function resetInputFields()
     {
         $this->date = Carbon::now()->format('Y-m-d');
@@ -58,7 +60,7 @@ class StockComponent extends Component
     public function store()
     {
         $validatedData = $this->validate([
-            'date' => 'required|date_format:Y-m-d', 
+            'date' => 'required|date_format:Y-m-d',
             'address' => 'required|string',
             'sets' => 'required|integer|min:0',
             'price_per_set' => 'required|numeric|min:0',
@@ -71,7 +73,7 @@ class StockComponent extends Component
         $total_price = $validatedData['price_per_set'] * $validatedData['sets'];
 
         $stock = Stock::create([
-            'date' => $this->date, 
+            'date' => $this->date,
             'address' => $this->address,
             'sets' => $this->sets,
             'pieces' => $pieces,
@@ -117,31 +119,53 @@ class StockComponent extends Component
         $validatedData = $this->validate([
             'date' => 'required|date_format:Y-m-d',
             'address' => 'nullable|string',
-            'sets' => 'required|integer',
+            'sets' => 'required|integer|min:0',
             'price_per_set' => 'required|numeric|min:0',
             'note' => 'nullable|string',
         ]);
 
-        $this->pieces = $this->sets * 3;
-        $this->price_per_piece = $this->price_per_set / 3;
-        $this->total_price = $this->sets * $this->price_per_set;
+        // Compute derived values
+        $pieces = $validatedData['sets'] * 3;
+        $price_per_piece = $validatedData['price_per_set'] / 3;
+        $total_price = $validatedData['sets'] * $validatedData['price_per_set'];
 
+        // Find the existing stock record
         $stock = Stock::find($this->stockId);
+        if (!$stock) {
+            sweetalert()->error('Stock not found.');
+            return;
+        }
+
+        // Calculate differences
+        $oldSets = $stock->sets;
+        $oldPieces = $stock->pieces;
+        $oldTotalPrice = $stock->total_price;
+
+        // Update the stock record
         $stock->update([
-            'date' => $this->date,
-            'address' => $this->address,
-            'sets' => $this->sets,
-            'pieces' => $this->pieces,
-            'price_per_set' => $this->price_per_set,
-            'price_per_piece' => $this->price_per_piece,
-            'total_price' => $this->total_price,
-            'note' => $this->note,
+            'date' => $validatedData['date'],
+            'address' => $validatedData['address'],
+            'sets' => $validatedData['sets'],
+            'pieces' => $pieces,
+            'price_per_set' => $validatedData['price_per_set'],
+            'price_per_piece' => $price_per_piece,
+            'total_price' => $total_price,
+            'note' => $validatedData['note'],
         ]);
+
+        // Update TotalStock
+        $totalStock = TotalStock::firstOrFail(); // Assuming there's only one row
+        $totalStock->total_sets += ($validatedData['sets'] - $oldSets);
+        $totalStock->total_pieces += ($pieces - $oldPieces);
+        $totalStock->save();
+
+        // Optionally, update balance or other related fields if necessary
 
         sweetalert()->success('Stock updated successfully.');
         $this->resetInputFields();
         $this->loadStocks();
     }
+
 
 
         public function delete($id)

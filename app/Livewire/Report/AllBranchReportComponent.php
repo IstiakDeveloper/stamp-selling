@@ -5,130 +5,127 @@ namespace App\Livewire\Report;
 use App\Models\Branch;
 use App\Models\BranchSale;
 use App\Models\BranchSaleOutstanding;
+use App\Models\OutstandingBalanceHistory;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use Livewire\Component;
 
 class AllBranchReportComponent extends Component
 {
-    public $branches;
-    public $branch_id;
-    public $month;
-    public $year;
-    public $specific_date;
-    public $sales;
-    public $reportData;
-    public $previousMonthOutstanding;
+    public $fromDate;
+    public $toDate;
+    public $reportData = [];
+    public $totalSets = 0;
+    public $totalPrice = 0;
+    public $totalCash = 0;
+    public $totalDue = 0;
 
     public function mount()
     {
-        $this->branches = Branch::all();
-        $this->month = Carbon::now()->format('m');
-        $this->year = Carbon::now()->format('Y');
-        $this->specific_date = null;
+        // Set default date range to the current month
+        $this->fromDate = Carbon::now()->startOfMonth()->format('Y-m-d');
+        $this->toDate = Carbon::now()->endOfMonth()->format('Y-m-d');
         $this->generateReport();
-    }
-
-    public function render()
-    {
-        return view('livewire.report.all-branch-report-component', ['sales' => $this->sales]);
-    }
-
-    public function generateReport()
-    {
-        $query = BranchSale::query();
-
-        if ($this->specific_date) {
-            $query->whereDate('date', $this->specific_date);
-        } else {
-            if ($this->month && $this->year) {
-                $query->whereMonth('date', $this->month)
-                    ->whereYear('date', $this->year);
-            }
-        }
-
-        if ($this->branch_id) {
-            $query->where('branch_id', $this->branch_id);
-        }
-
-        $this->sales = $query->get();
-
-        $totalSets = $this->sales->sum('sets');
-        $totalPrice = $this->sales->sum('total_price');
-        $totalCash = $this->sales->sum('cash');
-
-        // Calculate total outstanding balance for the selected month
-        $outstandingQuery = BranchSaleOutstanding::query();
-
-        if ($this->branch_id) {
-            $outstandingQuery->where('branch_id', $this->branch_id);
-        }
-
-        if ($this->specific_date) {
-            $outstandingQuery->whereDate('date', $this->specific_date);
-        } else {
-            if ($this->month && $this->year) {
-                $outstandingQuery->whereMonth('date', $this->month)
-                    ->whereYear('date', $this->year);
-            }
-        }
-
-        $totalExtraMoney = $outstandingQuery->sum('extra_money');
-        $totalOutstandingBalance = $outstandingQuery->sum('outstanding_balance');
-
-        $netOutstandingBalance = $totalOutstandingBalance - $totalExtraMoney;
-
-        // Calculate the previous month's outstanding balance
-        $currentMonthStart = Carbon::create($this->year, $this->month, 1);
-        $previousMonthStart = $currentMonthStart->copy()->subMonth()->startOfMonth();
-        $previousMonthEnd = $currentMonthStart->copy()->subMonth()->endOfMonth();
-
-        // Fetch total outstanding balance excluding the current month
-        $previousOutstandingQuery = BranchSaleOutstanding::whereBetween('date', [$previousMonthStart, $previousMonthEnd])
-            ->get();
-
-        $previousTotalExtraMoney = $previousOutstandingQuery->sum('extra_money');
-        $previousTotalOutstandingBalance = $previousOutstandingQuery->sum('outstanding_balance');
-
-        // Add the branch's current outstanding balance to calculate previous month total
-        $branches = Branch::all();
-        $branchOutstanding = $branches->sum('outstanding_balance');
-        
-        $this->previousMonthOutstanding = $previousTotalOutstandingBalance - $previousTotalExtraMoney + $branchOutstanding;
-
-        $this->reportData = [
-            'totalSets' => $totalSets,
-            'totalPrice' => $totalPrice,
-            'totalCash' => $totalCash,
-            'totalOutstandingBalance' => $netOutstandingBalance,
-        ];
     }
 
     public function updated($propertyName)
     {
-        if (in_array($propertyName, ['month', 'year', 'branch_id', 'specific_date'])) {
+        if (in_array($propertyName, ['fromDate', 'toDate'])) {
             $this->generateReport();
         }
     }
 
+    public function generateReport()
+    {
+        // Initialize the reportData array and cumulative totals
+        $this->reportData = [];
+        $this->totalSets = 0;
+        $this->totalPrice = 0;
+        $this->totalCash = 0;
+        $this->totalDue = 0;
+    
+        // Fetch all branches
+        $branches = Branch::all();
+    
+        foreach ($branches as $branch) {
+            // Start with the query for sales data
+            $query = BranchSale::where('branch_id', $branch->id);
+    
+            // Apply date filters if they are provided
+            if ($this->fromDate && $this->toDate) {
+                $fromDate = Carbon::parse($this->fromDate)->format('Y-m-d');
+                $toDate = Carbon::parse($this->toDate)->format('Y-m-d');
+                $query->whereBetween('date', [$fromDate, $toDate]);
+            } elseif ($this->fromDate) {
+                $fromDate = Carbon::parse($this->fromDate)->format('Y-m-d');
+                $query->where('date', '>=', $fromDate);
+            } elseif ($this->toDate) {
+                $toDate = Carbon::parse($this->toDate)->format('Y-m-d');
+                $query->where('date', '<=', $toDate);
+            }
+    
+            // Fetch sales data
+            $sales = $query->get();
+    
+            // Calculate total sets, price, and cash received within the date range
+            $sets = $sales->sum('sets');
+            $price = $sales->sum('total_price');
+            $cash = $sales->sum('cash');
+    
+            // Fetch the initial outstanding balance of the branch when it was created
+            $initialOutstanding = $branch->outstanding_balance;
+    
+            // Fetch the outstanding balance before the 'fromDate'
+            $previousOutstanding = OutstandingBalanceHistory::where('branch_id', $branch->id)
+                ->whereDate('date', '<', $this->fromDate)
+                ->orderBy('date', 'desc')
+                ->value('outstanding_balance') ?? 0;
+    
+            // Calculate the total due: initial outstanding + previous outstanding + price - cash
+            $totalDue = $initialOutstanding + $previousOutstanding + $price - $cash;
+    
+            // Add the branch data to the reportData array
+            $this->reportData[] = [
+                'branch_name' => $branch->branch_name,
+                'serial_number' => $branch->id,
+                'sets' => $sets,
+                'price' => $price,
+                'cash' => $cash,
+                'total_due' => $totalDue
+            ];
+    
+            // Accumulate the totals
+            $this->totalSets += $sets;
+            $this->totalPrice += $price;
+            $this->totalCash += $cash;
+            $this->totalDue += $totalDue;
+        }
+    }
+    
+
     public function downloadPdf()
     {
-        $this->generateReport(); // Ensure the report is up-to-date
-
-        $monthName = Carbon::createFromDate($this->year, $this->month, 1)->format('F');
-
         $data = [
-            'sales' => $this->sales,
             'reportData' => $this->reportData,
-            'previousMonthOutstanding' => $this->previousMonthOutstanding,
-            'monthYear' => $monthName . ' ' . $this->year,
+            'totalSets' => $this->totalSets,
+            'totalPrice' => $this->totalPrice,
+            'totalCash' => $this->totalCash,
+            'totalDue' => $this->totalDue,
+            'fromDate' => $this->fromDate,
+            'toDate' => $this->toDate,
         ];
 
         $pdf = Pdf::loadView('pdf.all-branch-report', $data);
 
         return response()->streamDownload(
-            fn() => print($pdf->output()), 
-            'all-branch-report-' . $monthName . '-' . $this->year . '.pdf'
+            fn() => print($pdf->output()),
+            'all-branch-report-' . ($this->fromDate ?? 'no-date') . '-to-' . ($this->toDate ?? 'no-date') . '.pdf'
         );
     }
+
+    public function render()
+    {
+        return view('livewire.report.all-branch-report-component');
+    }
+    
 }

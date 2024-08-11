@@ -3,6 +3,7 @@
 namespace App\Livewire;
 
 use App\Models\Balance;
+use App\Models\HeadOfficeDue;
 use App\Models\HeadOfficeSale;
 use App\Models\Payment;
 use App\Models\Stock;
@@ -17,12 +18,14 @@ class HeadOfficeSaleComponent extends Component
     public $sets;
     public $per_stamp_price;
     public $cash;
+    public $note; // Add property for note
 
     protected $rules = [
         'date' => 'required|date_format:Y-m-d',
-        'sets' => 'required|numeric|min:0.1',
+        'sets' => 'required|numeric',
         'per_stamp_price' => 'required|numeric|min:0',
         'cash' => 'required|numeric|min:0',
+        'note' => 'nullable|string', // Validate note as optional
     ];
 
     public function mount()
@@ -46,34 +49,101 @@ class HeadOfficeSaleComponent extends Component
         // Calculate total price based on sets and per_stamp_price
         $totalPrice = $this->sets * $this->per_stamp_price;
 
-        // Create Head Office Sale record
-        $headOfficeSale = HeadOfficeSale::create([
-            'date' => $this->date,
-            'sets' => $this->sets,
-            'per_set_price' => $this->per_stamp_price,
-            'total_price' => $totalPrice,
-            'cash' => $this->cash,
-        ]);
+        // Calculate the total due amount
+        $totalDue = HeadOfficeDue::sum('due_amount');
 
-        // Record payment
-        Payment::create([
-            'date' => $this->date,
-            'amount' => $this->cash,
-        ]);
+        if ($this->sets == 0 && $this->per_stamp_price == 0) {
+            // Create a new Head Office Sale record with all zero values except cash
+            $headOfficeSale = HeadOfficeSale::create([
+                'date' => $this->date,
+                'sets' => 0,
+                'per_set_price' => 0,
+                'total_price' => 0,
+                'cash' => $this->cash,
+                'note' => $this->note, // Include note
+            ]);
 
-        $piecesSold = $this->sets * 3;
-        $totalStock = TotalStock::find(1);
-        $totalStock->decrement('total_sets', $this->sets);
-        $totalStock->decrement('total_pieces', $piecesSold);
+            // Calculate the remaining due amount after subtracting the cash payment
+            $remainingDue = $totalDue - $this->cash;
 
-        $balance = Balance::first();
-        $balance->update(['total_balance' => $balance->total_balance + $this->cash]);
+            // Delete existing dues
+            HeadOfficeDue::truncate(); // Clears all existing dues
 
+            // Create a new record with the remaining due amount (if necessary)
+            if ($remainingDue > 0) {
+                HeadOfficeDue::create([
+                    'head_office_sale_id' => $headOfficeSale->id,
+                    'date' => $this->date,
+                    'due_amount' => $remainingDue,
+                    'note' => $this->note, // Include note
+                ]);
+            } else {
+                // Optionally create a record with zero due amount
+                HeadOfficeDue::create([
+                    'head_office_sale_id' => $headOfficeSale->id,
+                    'date' => $this->date,
+                    'due_amount' => 0,
+                    'note' => $this->note, // Include note
+                ]);
+            }
+
+            // Record payment
+            Payment::create([
+                'date' => $this->date,
+                'amount' => $this->cash,
+            ]);
+
+            // Update the balance
+            $balance = Balance::first();
+            $balance->update(['total_balance' => $balance->total_balance + $this->cash]);
+
+            sweetalert()->success('Due amount adjusted and cash received recorded successfully');
+        } else {
+            // Create Head Office Sale record with actual sets and prices
+            $headOfficeSale = HeadOfficeSale::create([
+                'date' => $this->date,
+                'sets' => $this->sets,
+                'per_set_price' => $this->per_stamp_price,
+                'total_price' => $totalPrice,
+                'cash' => $this->cash,
+                'note' => $this->note, // Include note
+            ]);
+
+            // Record payment
+            Payment::create([
+                'date' => $this->date,
+                'amount' => $this->cash,
+            ]);
+
+            // Check if there's any due
+            if ($this->cash < $totalPrice) {
+                // Calculate due amount
+                $dueAmount = $totalPrice - $this->cash;
+
+                // Create a due record linked to the sale
+                HeadOfficeDue::create([
+                    'head_office_sale_id' => $headOfficeSale->id,
+                    'date' => $this->date,
+                    'due_amount' => $dueAmount,
+                    'note' => $this->note, // Include note
+                ]);
+            }
+
+            // Update total stock and balance
+            $piecesSold = $this->sets * 3;
+            $totalStock = TotalStock::find(1);
+            $totalStock->decrement('total_sets', $this->sets);
+            $totalStock->decrement('total_pieces', $piecesSold);
+
+            $balance = Balance::first();
+            $balance->update(['total_balance' => $balance->total_balance + $this->cash]);
+
+            sweetalert()->success('Head office sale recorded successfully');
+        }
         // Reset input fields
         $this->resetInputFields();
-
-        sweetalert()->success('Head office sale recorded successfully)');
     }
+
 
     private function resetInputFields()
     {
@@ -81,6 +151,7 @@ class HeadOfficeSaleComponent extends Component
         $this->sets = null;
         $this->per_stamp_price = null;
         $this->cash = null;
+        $this->note = null; // Reset note field
     }
 
     public function calculateTotalPrice()

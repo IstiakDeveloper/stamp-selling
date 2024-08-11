@@ -39,7 +39,7 @@
 
     <div class="mt-8">
         <h2 class="text-lg font-semibold text-gray-900 mb-4">Expenditure Sheet</h2>
-    
+
         <div class="flex border-l border-r border-gray-300">
             <!-- Left Column -->
             <div class="w-1/2 border-r border-gray-300">
@@ -77,7 +77,7 @@
             </div>
 
             <div class="px-4">            <div class="inline-block h-[250px] min-h-[1em] w-0.5 self-stretch bg-gray-500 dark:bg-white/10"></div></div>
-    
+
             <!-- Right Column -->
             <div class="w-1/2">
                 <table class="min-w-full divide-y divide-gray-300 border border-gray-300">
@@ -90,6 +90,11 @@
                     </thead>
                     <tbody class="bg-white divide-y divide-gray-300">
                         <tr class="hover:bg-gray-100">
+                            <td class="px-6 py-4 whitespace-nowrap text-sm border-r border-gray-300">Starting Net Profit</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm border-r border-gray-300">{{ number_format($sofarNetProfitSumMonth, 2) }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm border-r border-gray-300">{{ number_format($sofarNetProfitSumYear, 2) }}</td>
+                        </tr>
+                        <tr class="hover:bg-gray-100">
                             <td class="px-6 py-4 whitespace-nowrap text-sm border-r border-gray-300">Branch Sales (Total Price)</td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm border-r border-gray-300">{{ number_format($branchSalePriceSumMonth, 2) }}</td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm border-r border-gray-300">{{ number_format($branchSalePriceSumYear, 2) }}</td>
@@ -99,21 +104,18 @@
                             <td class="px-6 py-4 whitespace-nowrap text-sm border-r border-gray-300">{{ number_format($headOfficeSalePriceSumMonth, 2) }}</td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm border-r border-gray-300">{{ number_format($headOfficeSalePriceSumYear, 2) }}</td>
                         </tr>
-                        <!-- Spacer Row -->
-                        <tr class="h-12"> <!-- Adjust the height as needed -->
-                            <td class="px-6 py-4 border-r border-gray-300" colspan="3"></td>
-                        </tr>
+                        
                         <tr class="bg-white font-bold">
                             <td class="px-6 py-4 whitespace-nowrap text-sm border-r border-gray-300">Total Sale</td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm border-r border-gray-300">{{ number_format($totalRevenueMonth, 2) }}</td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm border-r border-gray-300">{{ number_format($totalRevenueYear, 2) }}</td>
                         </tr>
                     </tbody>
-                    
+
                 </table>
             </div>
         </div>
-    
+
         <!-- Net Profit Table -->
         <div class="mt-4">
             <table class="min-w-full divide-y divide-gray-300 border border-gray-300">
@@ -138,5 +140,5 @@
             <button wire:click="exportPDF" class="bg-green-500 text-white px-4 py-2 rounded">Export PDF</button>
         </div>
     </div>
-    
+
 </div>

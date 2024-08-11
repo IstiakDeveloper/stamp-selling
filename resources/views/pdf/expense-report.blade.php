@@ -1,43 +1,77 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Expense Report</title>
+    <title>Expenses Report</title>
     <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
         table {
             width: 100%;
             border-collapse: collapse;
         }
-        table, th, td {
-            border: 1px solid black;
-        }
         th, td {
+            border: 1px solid #ddd;
             padding: 8px;
+        }
+        th {
+            background-color: #f4f4f4;
             text-align: left;
+        }
+        h2 {
+            text-align: center;
+        }
+        .text-right {
+            text-align: right;
+        }
+        .font-bold {
+            font-weight: bold;
         }
     </style>
 </head>
 <body>
-    <h1>Expense Report</h1>
-    <p>{{ $monthYear }}</p>
-    <p>Total Amount: ${{ number_format($totalAmount, 2) }}</p>
+    <h2>Expenses Report</h2>
+    <p><strong>Month:</strong> {{ date('F', mktime(0, 0, 0, $currentMonth, 1)) }}</p>
+    <p><strong>Year:</strong> {{ $currentYear }}</p>
+
     <table>
         <thead>
             <tr>
+                <th>SL</th>
                 <th>Date</th>
-                <th>Amount</th>
                 <th>Purpose</th>
+                <th>Amount</th>
+                <th>Net Expense</th>
             </tr>
         </thead>
         <tbody>
-            @foreach($expenses as $expense)
+            <tr>
+                <td colspan="4" class="text-right font-bold">Total Expenses Before Selected Month:</td>
+                <td class="font-bold">{{ number_format($previousMonthTotalExpenses, 2) }}</td>
+            </tr>
+
+            @php
+                $cumulativeNetExpense = $previousMonthTotalExpenses;
+            @endphp
+
+            @foreach ($expensesRecords as $index => $record)
+                @php
+                    $cumulativeNetExpense += $record->amount;
+                @endphp
                 <tr>
-                    <td>{{ $expense->date }}</td>
-                    <td>{{ $expense->amount }}</td>
-                    <td>{{ $expense->purpose }}</td>
+                    <td>{{ $index + 1 }}</td>
+                    <td>{{ \Carbon\Carbon::parse($record->date)->format('d/m/Y') }}</td>
+                    <td>{{ $record->purpose }}</td>
+                    <td>{{ number_format($record->amount, 2) }}</td>
+                    <td>{{ number_format($cumulativeNetExpense, 2) }}</td>
                 </tr>
             @endforeach
+
+            <tr>
+                <td colspan="3" class="text-right font-bold">Total Amount for Current Month:</td>
+                <td class="font-bold">{{ number_format($totalAmount, 2) }}</td>
+                <td></td>
+            </tr>
         </tbody>
     </table>
 </body>

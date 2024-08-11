@@ -7,19 +7,24 @@ use App\Livewire\BranchComponent;
 use App\Livewire\BranchSaleComponent;
 use App\Livewire\Dashboard;
 use App\Livewire\ExpenseComponent;
+use App\Livewire\FundManagementComponent;
 use App\Livewire\HeadOfficeSaleComponent;
 use App\Livewire\LoginComponent;
 use App\Livewire\MoneyComponent;
 use App\Livewire\RejectOrFreeComponent;
 use App\Livewire\Report\AllBranchReportComponent;
+use App\Livewire\Report\BankBalanceReport;
 use App\Livewire\Report\BranchSaleReportComponent;
 use App\Livewire\Report\ExpenseReportComponent;
+use App\Livewire\Report\FundManagementReportComponent;
 use App\Livewire\Report\HeadOfficeSaleReportComponent;
 use App\Livewire\Report\MoneyReport;
 use App\Livewire\Report\PurchaseReport;
 use App\Livewire\Report\RejectOrFreeReportComponent;
+use App\Livewire\Report\StockRegisterReportComponent;
 use App\Livewire\Report\TransectionReport;
 use App\Livewire\SetBranchPrice;
+use App\Livewire\SofarNetProfitComponent;
 use App\Livewire\StockComponent;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Route;
@@ -29,6 +34,7 @@ use Illuminate\Support\Facades\Route;
 Route::get('/migrate',function(){
     Artisan::call('migrate');
 });
+
 Route::get('/', LoginComponent::class)->name('home');
 Route::get('/login', LoginComponent::class)->name('login');
 Route::post('/', Logout::class)->name('logout');
@@ -53,10 +59,15 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/report/reject-free-report', RejectOrFreeReportComponent::class)->name('reject_free_report');
     Route::get('/report/expense-report', ExpenseReportComponent::class)->name('expense_report');
     Route::get('/report/branch-total-report', AllBranchReportComponent::class)->name('branch_total_report');
+    Route::get('/report/stock-register-report', StockRegisterReportComponent::class)->name('stock_register_report');
+    Route::get('/report/bank-balance-report', BankBalanceReport::class)->name('bank_balance_report');
+    Route::get('/report/fund-management-report', FundManagementReportComponent::class)->name('fund_management_report');
     Route::get('/balance-sheet', BalanceSheetAll::class)->name('balance_sheet');
 
 
     Route::get('/report/transection-report', TransectionReport::class)->name('transection_report');
+    Route::get('/sofar-net-profit', SofarNetProfitComponent::class)->name('sofar-net-profit.index');
+    Route::get('/fund-management', FundManagementComponent::class)->name('fund_management');
 
 
 

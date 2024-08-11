@@ -1,55 +1,70 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Reject or Free Report</title>
     <style>
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        table, th, td {
-            border: 1px solid black;
-        }
-        th, td {
-            padding: 8px;
-            text-align: left;
-        }
-        .total-summary {
-            margin-bottom: 20px;
-        }
+        body { font-family: Arial, sans-serif; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { border: 1px solid #ddd; padding: 8px; }
+        th { background-color: #f4f4f4; }
+        .text-right { text-align: right; }
+        .font-bold { font-weight: bold; }
+        .text-left { text-align: left; }
     </style>
 </head>
 <body>
-    <h1>Reject or Free Report</h1>
-    <p>{{ $monthYear }}</p>
+    <h2>Reject or Free Report</h2>
 
-    <div class="total-summary">
-        <p>Total Sets: <span class="text-blue-600">{{ $totalSets }}</span></p>
-        <p>Total Purchase Price: <span class="text-blue-600">${{ number_format($totalPurchasePrice, 2) }}</span></p>
+    <div>
+        <p><strong>Month:</strong> {{ date('F', mktime(0, 0, 0, $currentMonth, 1)) }} {{ $currentYear }}</p>
+        <p><strong>Average Stamp Price per Set:</strong> {{ number_format($averageStampPricePerSet, 2) }}</p>
     </div>
 
     <table>
         <thead>
             <tr>
+                <th>SL</th>
                 <th>Date</th>
-                <th>Sets</th>
-                <th>Purchase Price Per Set</th>
-                <th>Total Purchase Price</th>
                 <th>Note</th>
+                <th>Sets</th>
+                <th>Purchase Price</th>
+                <th>Total Price</th>
+                <th>Net Loss</th>
             </tr>
         </thead>
         <tbody>
-            @foreach($rejectOrFreeData as $data)
+            <tr>
+                <td colspan="6" class="text-right font-bold">Previous Month's Net Loss:</td>
+                <td class="text-left font-bold">{{ number_format($previousMonthNetLoss, 2) }}</td>
+            </tr>
+
+            @php
+                $cumulativeNetLoss = $previousMonthNetLoss;
+            @endphp
+
+            @foreach ($rejectOrFreeRecords as $index => $record)
+                @php
+                    $totalPrice = $record->sets * $averageStampPricePerSet;
+                    $cumulativeNetLoss += $totalPrice;
+                @endphp
                 <tr>
-                    <td>{{ $data->date }}</td>
-                    <td>{{ $data->sets }}</td>
-                    <td>{{ $data->purchase_price_per_set }}</td>
-                    <td>{{ $data->purchase_price_total }}</td>
-                    <td>{{ $data->note }}</td>
+                    <td>{{ $index + 1 }}</td>
+                    <td>{{ \Carbon\Carbon::parse($record->date)->format('d/m/Y') }}</td>
+                    <td>{{ $record->note }}</td>
+                    <td>{{ $record->sets }}</td>
+                    <td>{{ number_format($averageStampPricePerSet, 2) }}</td>
+                    <td>{{ number_format($totalPrice, 2) }}</td>
+                    <td>{{ number_format($cumulativeNetLoss, 2) }}</td>
                 </tr>
             @endforeach
+
+            <tr>
+                <td colspan="3" class="text-right font-bold">Current Month's Totals:</td>
+                <td class="text-left font-bold">{{ number_format($rejectOrFreeRecords->sum('sets'), 0) }}</td>
+                <td></td>
+                <td></td>
+                <td class="text-left font-bold">{{ number_format($cumulativeNetLoss, 2) }}</td>
+            </tr>
         </tbody>
     </table>
 </body>

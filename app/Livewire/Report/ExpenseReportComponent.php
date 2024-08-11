@@ -9,53 +9,45 @@ use Livewire\Component;
 
 class ExpenseReportComponent extends Component
 {
-    public $year;
-    public $month;
-    public $expenses;
-    public $monthNameYear;
+    public $currentMonth;
+    public $currentYear;
+    public $expensesRecords;
     public $totalAmount;
+    public $previousMonthTotalExpenses;
 
     public function mount()
     {
-        $this->year = now()->year;
-        $this->month = now()->month;
+        $this->currentMonth = now()->month;
+        $this->currentYear = now()->year;
+
+        $this->previousMonthTotalExpenses = $this->calculatePreviousMonthTotalExpenses($this->currentMonth, $this->currentYear);
+
+        $this->fetchRecords();
     }
 
-    public function updated($propertyName)
+    public function calculatePreviousMonthTotalExpenses($selectedMonth, $selectedYear)
     {
-        if ($this->year && $this->month) {
-            $this->generateReport();
-        }
+        $endDate = Carbon::create($selectedYear, $selectedMonth, 1)->subDay();
+
+        $previousTotal = Expense::whereDate('date', '<=', $endDate)
+                                ->sum('amount');
+
+        return $previousTotal;
     }
 
-    public function generateReport()
+    public function fetchRecords()
     {
-        // Get expenses data for the selected month
-        $this->expenses = Expense::whereYear('date', $this->year)
-                        ->whereMonth('date', $this->month)
-                        ->get();
+        $this->expensesRecords = Expense::whereMonth('date', $this->currentMonth)
+                                        ->whereYear('date', $this->currentYear)
+                                        ->get();
 
-        // Calculate total amount
-        $this->totalAmount = $this->expenses->sum('amount');
-
-        // Format month and year
-        $this->monthNameYear = Carbon::createFromDate($this->year, $this->month, 1)->format('F Y');
+        $this->totalAmount = $this->expensesRecords->sum('amount');
     }
 
-    public function downloadPdf()
+    public function updated($field)
     {
-        $data = [
-            'expenses' => $this->expenses,
-            'monthYear' => $this->monthNameYear,
-            'totalAmount' => $this->totalAmount
-        ];
-
-        $pdf = Pdf::loadView('pdf.expense-report', $data);
-
-        return response()->streamDownload(
-            fn() => print($pdf->output()), 
-            'expense-report-'.$this->monthNameYear.'.pdf'
-        );
+        $this->previousMonthTotalExpenses = $this->calculatePreviousMonthTotalExpenses($this->currentMonth, $this->currentYear);
+        $this->fetchRecords();
     }
 
     public function render()
@@ -63,4 +55,22 @@ class ExpenseReportComponent extends Component
         return view('livewire.report.expense-report-component');
     }
 
+    public function downloadPDF()
+    {
+        $data = [
+            'expensesRecords' => $this->expensesRecords,
+            'totalAmount' => $this->totalAmount,
+            'previousMonthTotalExpenses' => $this->previousMonthTotalExpenses,
+            'currentMonth' => $this->currentMonth,
+            'currentYear' => $this->currentYear,
+            'monthNameYear' => date('F-Y', mktime(0, 0, 0, $this->currentMonth, 1)), // Month and Year for filename
+        ];
+
+        $pdf = Pdf::loadView('pdf.expense-report', $data);
+
+        return response()->streamDownload(
+            fn() => print($pdf->output()), 
+            'expense-report-'.$data['monthNameYear'].'.pdf'
+        );
+    }
 }

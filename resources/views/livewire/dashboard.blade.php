@@ -31,7 +31,7 @@
                     @endforeach
                 </select>
             </div>
-        </form>        
+        </form>
     </div>
 
     <!-- Metrics Section -->
@@ -40,7 +40,7 @@
         <div class="bg-white-d shadow-md rounded-lg p-6 flex items-center justify-between mt-4">
             <div>
                 <span class="text-gray-400 text-sm">Total Balance</span>
-                <h2 class="text-2xl font-bold">৳{{ number_format($netTotalBalance, 2) }}</h2>
+                <h2 class="text-2xl font-bold">{{ number_format($netTotalBalance, 2) }}</h2>
             </div>
             <x-lucide-database class="text-blue-500 h-10 w-10" />
         </div>
@@ -48,7 +48,7 @@
         <div class="bg-white-d shadow-md rounded-lg p-6 flex items-center justify-between mt-4">
             <div>
                 <span class="text-gray-400 text-sm">Bank Balance</span>
-                <h2 class="text-2xl font-bold">৳{{ number_format($totalBalance, 2) }}</h2>
+                <h2 class="text-2xl font-bold">{{ number_format($totalBalance, 2) }}</h2>
             </div>
             <x-lucide-currency class="text-blue-500 h-10 w-10" />
         </div>
@@ -57,7 +57,7 @@
         <div class="bg-white-d shadow-md rounded-lg p-6 flex items-center justify-between mt-4">
             <div>
                 <span class="text-gray-400 text-sm">Total Sale Amount</span>
-                <h2 class="text-2xl font-bold">৳{{ number_format($totalSaleAmount, 2) }}</h2>
+                <h2 class="text-2xl font-bold">{{ number_format($totalSaleAmount, 2) }}</h2>
             </div>
             <x-lucide-shopping-bag class="text-blue-500 h-10 w-10" />
         </div>
@@ -66,7 +66,7 @@
         <div class="bg-white-d shadow-md rounded-lg p-6 flex items-center justify-between mt-4">
             <div>
                 <span class="text-gray-400 text-sm">Total Cash Receive</span>
-                <h2 class="text-2xl font-bold">৳{{ number_format($totalPaymentAmount, 2) }}</h2>
+                <h2 class="text-2xl font-bold">{{ number_format($totalPaymentAmount, 2) }}</h2>
             </div>
             <x-lucide-circle-dollar-sign class="text-blue-500 h-10 w-10" />
         </div>
@@ -75,7 +75,7 @@
         <div class="bg-white-d shadow-md rounded-lg p-6 flex items-center justify-between mt-4">
             <div>
                 <span class="text-gray-400 text-sm">Total Due</span>
-                <h2 class="text-2xl font-bold">৳{{ number_format($totalOutstandingBalance, 2) }}</h2>
+                <h2 class="text-2xl font-bold">{{ number_format($totalOutstandingBalance, 2) }}</h2>
             </div>
             <x-lucide-hand-coins class="text-blue-500 h-10 w-10" />
         </div>
@@ -85,7 +85,7 @@
         <div class="bg-white-d shadow-md rounded-lg p-6 flex items-center justify-between mt-4">
             <div>
                 <span class="text-gray-400 text-sm">Buy Price</span>
-                <h2 class="text-2xl font-bold">৳{{ number_format($totalSetsBuyPrice, 2) }}</h2>
+                <h2 class="text-2xl font-bold">{{ number_format($totalSetsBuyPrice, 2) }}</h2>
             </div>
             <x-lucide-credit-card class="text-blue-500 h-10 w-10" />
         </div>
@@ -94,7 +94,7 @@
                 <div class="bg-white-d shadow-md rounded-lg p-6 flex items-center justify-between mt-4">
                     <div>
                         <span class="text-gray-400 text-sm">Per Set Buy Price</span>
-                        <h2 class="text-2xl font-bold">৳{{ number_format($averageStampPricePerSet, 2) }}</h2>
+                        <h2 class="text-2xl font-bold">{{ number_format($averageStampPricePerSet, 2) }}</h2>
                     </div>
                     <x-lucide-diamond-percent class="text-blue-500 h-10 w-10" />
                 </div>
@@ -103,7 +103,7 @@
         <div class="bg-white-d shadow-md rounded-lg p-6 flex items-center justify-between mt-4">
             <div>
                 <span class="text-gray-400 text-sm">Expences & Reject</span>
-                <h2 class="text-2xl font-bold">৳{{ number_format($netExpences, 2) }}</h2>
+                <h2 class="text-2xl font-bold">{{ number_format($netExpences, 2) }}</h2>
             </div>
             <x-lucide-wallet class="text-blue-500 h-10 w-10" />
         </div>
@@ -111,7 +111,7 @@
         <div class="bg-white-d shadow-md rounded-lg p-6 flex items-center justify-between mt-4">
             <div>
                 <span class="text-gray-400 text-sm">Net Profit</span>
-                <h2 class="text-2xl font-bold">৳{{ number_format($totalProfit, 2) }}</h2>
+                <h2 class="text-2xl font-bold">{{ number_format($totalProfit, 2) }}</h2>
             </div>
             <x-lucide-banknote class="text-blue-500 h-10 w-10" />
         </div>
@@ -133,7 +133,7 @@
             </div>
             <x-lucide-shopping-cart class="text-blue-500 h-10 w-10" />
         </div> --}}
-    
+
         <!-- Total Stamp Available -->
         <div class="bg-white-d shadow-md rounded-lg p-6 flex items-center justify-between mt-4">
             <div>

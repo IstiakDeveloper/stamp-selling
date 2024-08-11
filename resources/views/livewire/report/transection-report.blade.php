@@ -9,7 +9,7 @@
                     @endforeach
                 </select>
             </div>
-        
+
             <div class="mb-6">
                 <label for="month" class="block text-sm font-medium text-gray-700">Month:</label>
                 <select id="month" wire:model.live="month" class="form-select mt-1 block w-full py-2 px-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
@@ -19,13 +19,13 @@
                 </select>
             </div>
         </div>
-    
+
         <div class="flex items-center gap-4">
             <div class="mb-6">
                 <label for="fromDate" class="block text-sm font-medium text-gray-700">From Date:</label>
                 <input type="date" id="fromDate" wire:model.live="fromDate" class="form-input mt-1 block w-full py-2 px-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
             </div>
-        
+
             <div class="mb-6">
                 <label for="toDate" class="block text-sm font-medium text-gray-700">To Date:</label>
                 <input type="date" id="toDate" wire:model.live="toDate" class="form-input mt-1 block w-full py-2 px-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
