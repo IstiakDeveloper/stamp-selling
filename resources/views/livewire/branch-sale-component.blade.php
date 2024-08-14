@@ -40,9 +40,9 @@
             <label for="total_price" class="block text-sm font-medium text-gray-700">Total Price:</label>
             <span class="block text-lg font-semibold mt-1">
                 @if ($sets > 0)
-                    {{ number_format($totalPrice, 2) }}
+                    @formatNumber($totalPrice)
                 @else
-                    {{ number_format(0, 2) }}
+                    @formatNumber(0)
                 @endif
             </span>
         </div>
@@ -57,9 +57,9 @@
             @if ($cash !== null && is_numeric($cash))
                 @if ($extraMoney !== null)
                     @if ($extraMoney > 0)
-                        <p class="text-green-500">Extra Money: + {{ number_format($extraMoney, 2) }}</p>
+                        <p class="text-green-500">Extra Money: + @formatNumber($extraMoney)</p>
                     @elseif ($extraMoney < 0)
-                        <p class="text-red-500">Due Amount: - {{ number_format(abs($extraMoney), 2) }}</p>
+                        <p class="text-red-500">Due Amount: - @formatNumber(abs($extraMoney))</p>
                     @else
                         <p class="text-gray-500">Exact Amount Received</p>
                     @endif
@@ -97,10 +97,17 @@
                     <tr class="border-b border-gray-200 hover:bg-gray-100">
                         <td class="px-6 py-4 whitespace-nowrap">{{ $transaction->date }}</td>
                         <td class="px-6 py-4 whitespace-nowrap">{{ $transaction->branch->branch_name }}</td>
-                        <td class="px-6 py-4 whitespace-nowrap">{{ $transaction->sets }}</td>
-                        <td class="px-6 py-4 whitespace-nowrap">{{ number_format($transaction->per_set_price, 2) }}</td>
-                        <td class="px-6 py-4 whitespace-nowrap">{{ number_format($transaction->total_price, 2) }}</td>
-                        <td class="px-6 py-4 whitespace-nowrap">{{ number_format($transaction->cash, 2) }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            @php
+                                $value = $transaction->sets;
+                                // Format to two decimal places if needed
+                                $formattedValue = $value - floor($value) > 0 ? number_format($value, 2) : number_format($value, 0);
+                            @endphp
+                            {{ $formattedValue }}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">@formatNumber($transaction->per_set_price)</td>
+                        <td class="px-6 py-4 whitespace-nowrap">@formatNumber($transaction->total_price)</td>
+                        <td class="px-6 py-4 whitespace-nowrap">@formatNumber($transaction->cash)</td>
                     </tr>
                 @endforeach
             </tbody>

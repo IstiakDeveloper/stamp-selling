@@ -1,6 +1,6 @@
 <div class="mx-auto p-6 rounded-lg shadow-md bg-white">
     <div class="mt-8">
-        <h2 class="text-lg font-semibold text-gray-900 mb-4">Blance Sheet</h2>
+        <h2 class="text-lg font-semibold text-gray-900 mb-4">Balance Sheet</h2>
 
         <div class="flex border-l border-r border-gray-300">
             <!-- Left Column -->
@@ -15,18 +15,18 @@
                     <tbody class="bg-white divide-y divide-gray-300">
                         <tr class="hover:bg-gray-100">
                             <td class="px-6 py-4 whitespace-nowrap text-sm border-r border-gray-300">Funds</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm border-r border-gray-300">{{ number_format($totalCashIn, 2) }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm border-r border-gray-300">@formatNumber($totalCashIn)</td>
                         </tr>
                         <tr class="hover:bg-gray-100">
                             <td class="px-6 py-4 whitespace-nowrap text-sm border-r border-gray-300">Net Profit</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm border-r border-gray-300">{{ number_format($netProfit, 2) }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm border-r border-gray-300">@formatNumber($netProfit)</td>
                         </tr>
                         <tr class="hover:bg-gray-100">
                             <td class="px-6 py-4 whitespace-nowrap text-sm border-r border-gray-300 h-[3.3rem]"></td>
                         </tr>
                         <tr class="bg-gray-50">
                             <td class="px-6 py-4 whitespace-nowrap text-sm border-r border-gray-300 font-bold">Total</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm font-bold">{{ number_format($totalCashIn + $netProfit, 2) }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-bold">@formatNumber($totalCashIn + $netProfit)</td>
                         </tr>
                     </tbody>
                 </table>
@@ -46,19 +46,19 @@
                     <tbody class="bg-white divide-y divide-gray-300">
                         <tr class="hover:bg-gray-100">
                             <td class="px-6 py-4 whitespace-nowrap text-sm border-r border-gray-300">Bank Balance</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm border-r border-gray-300">{{ number_format($totalBankOrHandBalance, 2) }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm border-r border-gray-300">@formatNumber($totalBankOrHandBalance)</td>
                         </tr>
                         <tr class="hover:bg-gray-100">
                             <td class="px-6 py-4 whitespace-nowrap text-sm border-r border-gray-300">Branches Due</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm border-r border-gray-300">{{ number_format($outstandingTotal, 2) }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm border-r border-gray-300">@formatNumber($outstandingTotal)</td>
                         </tr>
                         <tr class="hover:bg-gray-100">
                             <td class="px-6 py-4 whitespace-nowrap text-sm border-r border-gray-300">Stock</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm border-r border-gray-300">{{ number_format($stockStampBuyPrice, 2) }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm border-r border-gray-300">@formatNumber($stockStampBuyPrice)</td>
                         </tr>
                         <tr class="bg-gray-50">
                             <td class="px-6 py-4 whitespace-nowrap text-sm border-r border-gray-300 font-bold">Total</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm font-bold">{{ number_format($outstandingTotal + $totalBankOrHandBalance + $stockStampBuyPrice, 2) }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-bold">@formatNumber($outstandingTotal + $totalBankOrHandBalance + $stockStampBuyPrice)</td>
                         </tr>
                     </tbody>
                 </table>

@@ -41,7 +41,7 @@
 
     <div class="mt-6 p-4 bg-gray-50 rounded flex justify-between">
         <div>
-            <h3 class="text-lg font-medium text-gray-900">Total Fund: {{ number_format($totalFund, 2) }}</h3>
+            <h3 class="text-lg font-medium text-gray-900">Total Fund: @formatNumber($totalFund)</h3>
         </div>
         <div>
             <a class="bg-indigo-600 text-white font-bold py-2 px-4 rounded hover:bg-indigo-700" href="{{route('fund_management_report')}}">View Report</a>

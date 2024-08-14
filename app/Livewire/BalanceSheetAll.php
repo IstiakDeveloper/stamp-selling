@@ -40,7 +40,7 @@ class BalanceSheetAll extends Component
         $totalCashIn = TotalFund::get()->sum('total_fund');
         $totalCashOut = Money::where('type', 'cash_out')
             ->sum('amount');
-        $this->totalCashIn = $totalCashIn - $totalCashOut;
+        $this->totalCashIn = $totalCashIn;
 
         // Calculate after-sale outstanding
         $afterSaleOutstanding = BranchSaleOutstanding::sum('outstanding_balance') - BranchSaleOutstanding::sum('extra_money');
@@ -78,6 +78,7 @@ class BalanceSheetAll extends Component
         // Calculate total lose
         $totalExpense = Expense::sum('amount');
         $totalLose = $totalRejectOrFree + $saleSetBuyPrice + $totalExpense;
+
 
         // Calculate total sale
         $totalSale = $totalBranchSalePrice + $totalHeadOfficeSalePrice;

@@ -26,16 +26,16 @@
             <thead>
                 <tr class="bg-gray-100 text-gray-700 uppercase text-xs font-semibold border-b border-gray-300">
                     <th class="py-3 px-4 text-left">SL</th>
-                    <th class="py-3 px-4 text-left">Date</th>
-                    <th class="py-3 px-4 text-left">Purpose</th>
-                    <th class="py-3 px-4 text-left">Amount</th>
-                    <th class="py-3 px-4 text-left">Net Expense</th>
+                    <th class="py-3 px-4 text-center">Date</th>
+                    <th class="py-3 px-4 text-center">Purpose</th>
+                    <th class="py-3 px-4 text-center">Amount</th>
+                    <th class="py-3 px-4 text-right">Total Expense</th>
                 </tr>
             </thead>
             <tbody class="text-gray-700 text-sm">
                 <tr class="bg-gray-50 font-semibold border-b border-gray-300">
-                    <td colspan="4" class="text-right px-4 py-2">Total Expenses Before:</td>
-                    <td class="px-4 py-2">{{ number_format($previousMonthTotalExpenses, 2) }}</td>
+                    <td colspan="4" class="text-right px-4 py-2">Previous Expenses:</td>
+                    <td class="px-4 py-2 text-right">{{ rtrim(rtrim(number_format($previousMonthTotalExpenses, 2, '.', ''), '0'), '.') }}</td>
                 </tr>
 
                 @php
@@ -48,16 +48,16 @@
                     @endphp
                     <tr class="border-b border-gray-300 hover:bg-gray-50">
                         <td class="py-3 px-4 text-left">{{ $index + 1 }}</td>
-                        <td class="py-3 px-4 text-left">{{ \Carbon\Carbon::parse($record->date)->format('d/m/Y') }}</td>
-                        <td class="py-3 px-4 text-left">{{ $record->purpose }}</td>
-                        <td class="py-3 px-4 text-left">{{ number_format($record->amount, 2) }}</td>
-                        <td class="py-3 px-4 text-left">{{ number_format($cumulativeNetExpense, 2) }}</td>
+                        <td class="py-3 px-4 text-center">{{ \Carbon\Carbon::parse($record->date)->format('d/m/Y') }}</td>
+                        <td class="py-3 px-4 text-center">{{ $record->purpose }}</td>
+                        <td class="py-3 px-4 text-center">{{ rtrim(rtrim(number_format($record->amount, 2, '.', ''), '0'), '.') }}</td>
+                        <td class="py-3 px-4 text-right">{{ rtrim(rtrim(number_format($cumulativeNetExpense, 2, '.', ''), '0'), '.') }}</td>
                     </tr>
                 @endforeach
 
                 <tr class="bg-gray-50 font-semibold border-t border-gray-300">
-                    <td colspan="3" class="text-right px-4 py-2">Total Amount for Current Month:</td>
-                    <td class="px-4 py-2">{{ number_format($totalAmount, 2) }}</td>
+                    <td colspan="3" class="text-left px-4 py-2">This Month:</td>
+                    <td class="px-4 py-2 text-center">{{ rtrim(rtrim(number_format($totalAmount, 2, '.', ''), '0'), '.') }}</td>
                     <td></td>
                 </tr>
             </tbody>

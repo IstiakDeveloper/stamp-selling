@@ -18,6 +18,13 @@
 
 <body>
 
+    <div class="loading-overlay" id="loading-overlay">
+        <div class="loading-dots">
+            <div class="dot">1</div>
+            <div class="dot">2</div>
+            <div class="dot">3</div>
+        </div>
+    </div>
     <div class="container">
         <!-- Sidebar Section -->
         <aside>
@@ -245,6 +252,35 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.js"></script>
     <script src="{{asset('index.js')}}"></script>
     <script>
+        // Show the loading spinner
+        function showLoading() {
+            document.getElementById('loading-overlay').style.display = 'flex';
+        }
+
+        // Hide the loading spinner
+        function hideLoading() {
+            document.getElementById('loading-overlay').style.display = 'none';
+        }
+
+        // Example usage
+        document.addEventListener('DOMContentLoaded', () => {
+            hideLoading(); // Hide spinner when page is fully loaded
+        });
+
+        // Show the spinner when initiating some async operation
+        function fetchData() {
+            showLoading();
+            // Simulate an async operation
+            setTimeout(() => {
+                // Do your data fetching here
+                hideLoading();
+            }, 2000); // Example timeout
+        }
+
+        // Trigger data fetching as an example
+        fetchData();
+    </script>
+    <script>
         document.querySelectorAll('.dropdown-toggle').forEach(item => {
             item.addEventListener('click', event => {
                 event.preventDefault();
@@ -268,6 +304,9 @@
         });
 
     </script>
+
+
+
 </body>
 
 </html>

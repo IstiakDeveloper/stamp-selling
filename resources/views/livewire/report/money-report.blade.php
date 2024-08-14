@@ -26,7 +26,14 @@
     </div>
 
     <div class="mb-4">
-        <h3 class="text-lg font-medium text-gray-700">Opening Balance: {{ number_format($openingBalance, 2) }}</h3>
+        <h3 class="text-lg font-medium text-gray-700">Opening Balance: 
+            @php
+                $formattedOpeningBalance = ($openingBalance == intval($openingBalance)) 
+                    ? number_format($openingBalance, 0) 
+                    : number_format($openingBalance, 2);
+            @endphp
+            {{ $formattedOpeningBalance }}
+        </h3>
     </div>
 
     <div class="overflow-x-auto">
@@ -41,9 +48,14 @@
             </thead>
             <tbody class="bg-white">
                 @foreach($transactions as $transaction)
+                    @php
+                        $formattedAmount = ($transaction->amount == intval($transaction->amount)) 
+                            ? number_format($transaction->amount, 0) 
+                            : number_format($transaction->amount, 2);
+                    @endphp
                     <tr>
                         <td class="py-2 px-4 border-b border-gray-200">{{ $transaction->date }}</td>
-                        <td class="py-2 px-4 border-b border-gray-200">{{ $transaction->amount }}</td>
+                        <td class="py-2 px-4 border-b border-gray-200">{{ $formattedAmount }}</td>
                         <td class="py-2 px-4 border-b border-gray-200">{{ $transaction->type }}</td>
                         <td class="py-2 px-4 border-b border-gray-200">{{ $transaction->details }}</td>
                     </tr>

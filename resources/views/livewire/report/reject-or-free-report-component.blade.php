@@ -30,18 +30,20 @@
             <thead>
                 <tr class="bg-gray-100 text-gray-700 uppercase text-xs font-medium">
                     <th class="py-4 px-6 text-left">SL</th>
-                    <th class="py-4 px-6 text-left">Date</th>
-                    <th class="py-4 px-6 text-left">Note</th>
-                    <th class="py-4 px-6 text-left">Sets</th>
-                    <th class="py-4 px-6 text-left">Purchase Price</th>
-                    <th class="py-4 px-6 text-left">Total Price</th>
-                    <th class="py-4 px-6 text-left">Net Loss</th>
+                    <th class="py-4 px-6 text-center">Date</th>
+                    <th class="py-4 px-6 text-center">Note</th>
+                    <th class="py-4 px-6 text-center">Sets</th>
+                    <th class="py-4 px-6 text-center">Purchase Price</th>
+                    <th class="py-4 px-6 text-center">Loss</th>
+                    <th class="py-4 px-6 text-right">Total Loss</th>
                 </tr>
             </thead>
             <tbody class="text-gray-700 text-sm">
                 <tr class="bg-white border-b border-gray-200 hover:bg-gray-50">
-                    <td class="text-right py-3 px-6 font-bold" colspan="6">Previous Net Loss:</td>
-                    <td class="text-left py-3 px-6" >{{ number_format($previousMonthNetLoss, 2) }}</td>
+                    <td class="text-right py-3 px-6 font-bold" colspan="6">Previous Loss:</td>
+                    <td class="text-right py-3 px-6">
+                        {{ rtrim(rtrim(number_format($previousMonthNetLoss, 2, '.', ''), '0'), '.') }}
+                    </td>
                 </tr>
         
                 @php
@@ -57,21 +59,21 @@
                     @endphp
                     <tr class="bg-white border-b border-gray-200 hover:bg-gray-50">
                         <td class="py-3 px-6 text-left">{{ $index + 1 }}</td>
-                        <td class="py-3 px-6 text-left">{{ \Carbon\Carbon::parse($record->date)->format('d/m/Y') }}</td>
-                        <td class="py-3 px-6 text-left">{{ $record->note }}</td>
-                        <td class="py-3 px-6 text-left">{{ $record->sets }}</td>
-                        <td class="py-3 px-6 text-left">{{ number_format($averageStampPricePerSet, 2) }}</td>
-                        <td class="py-3 px-6 text-left">{{ number_format($totalPrice, 2) }}</td>
-                        <td class="py-3 px-6 text-left">{{ number_format($cumulativeNetLoss, 2) }}</td>
+                        <td class="py-3 px-6 text-center">{{ \Carbon\Carbon::parse($record->date)->format('d/m/Y') }}</td>
+                        <td class="py-3 px-6 text-center">{{ $record->note }}</td>
+                        <td class="py-3 px-6 text-center">{{ number_format($record->sets, 0) }}</td>
+                        <td class="py-3 px-6 text-center">{{ rtrim(rtrim(number_format($averageStampPricePerSet, 2, '.', ''), '0'), '.') }}</td>
+                        <td class="py-3 px-6 text-center">{{ rtrim(rtrim(number_format($totalPrice, 2, '.', ''), '0'), '.') }}</td>
+                        <td class="py-3 px-6 text-right">{{ rtrim(rtrim(number_format($cumulativeNetLoss, 2, '.', ''), '0'), '.') }}</td>
                     </tr>
                 @endforeach
         
                 <tr class="bg-gray-50 font-semibold">
-                    <td colspan="3" class="text-right py-3 px-6 font-bold">Current Month's Totals:</td>
-                    <td class="text-left py-3 px-6">{{ number_format($totalSetsThisMonth, 0) }}</td>
+                    <td colspan="3" class="text-right py-3 px-6 font-bold">This Month:</td>
+                    <td class="text-center py-3 px-6">{{ number_format($totalSetsThisMonth, 0) }}</td>
                     <td></td>
                     <td></td>
-                    <td class="text-left pl-6">{{ number_format($cumulativeNetLoss, 2) }}</td>
+                    <td class="text-right py-3 px-6">{{ rtrim(rtrim(number_format($cumulativeNetLoss, 2, '.', ''), '0'), '.') }}</td>
                 </tr>
             </tbody>
         </table>        

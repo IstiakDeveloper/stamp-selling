@@ -1,7 +1,7 @@
 <div class="p-6 max-w-6xl mx-auto bg-white shadow-lg rounded-lg">
     <!-- Total Balance -->
     <div class="mb-6">
-        <p class="text-2xl font-bold text-gray-800">Total Balance: {{ number_format($totalBalance, 2) }}</p>
+        <p class="text-2xl font-bold text-gray-800">Total Balance: @formatNumber($totalBalance)</p>
     </div>
 
     <!-- Add Transaction Form -->
@@ -108,7 +108,7 @@
                     @foreach($transactions as $transaction)
                     <tr class="hover:bg-gray-50 transition duration-150 ease-in-out">
                         <td class="px-6 py-4 whitespace-nowrap">{{ $transaction->date }}</td>
-                        <td class="px-6 py-4 whitespace-nowrap">{{ number_format($transaction->amount, 2) }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap">@formatNumber($transaction->amount)</td>
                         <td class="px-6 py-4 whitespace-nowrap">{{ $transaction->type }}</td>
                         <td class="px-6 py-4 whitespace-nowrap">{{ $transaction->details }}</td>
                         <td class="px-6 py-4 whitespace-nowrap">

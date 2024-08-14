@@ -17,7 +17,7 @@
 
     <div>
         <p><strong>Month:</strong> {{ date('F', mktime(0, 0, 0, $currentMonth, 1)) }} {{ $currentYear }}</p>
-        <p><strong>Average Stamp Price per Set:</strong> {{ number_format($averageStampPricePerSet, 2) }}</p>
+        <p><strong>Purchase Price:</strong> {{ rtrim(rtrim(number_format($averageStampPricePerSet, 2, '.', ''), '0'), '.') }}</p>
     </div>
 
     <table>
@@ -28,14 +28,14 @@
                 <th>Note</th>
                 <th>Sets</th>
                 <th>Purchase Price</th>
-                <th>Total Price</th>
-                <th>Net Loss</th>
+                <th>Loss</th>
+                <th>Total Loss</th>
             </tr>
         </thead>
         <tbody>
             <tr>
-                <td colspan="6" class="text-right font-bold">Previous Month's Net Loss:</td>
-                <td class="text-left font-bold">{{ number_format($previousMonthNetLoss, 2) }}</td>
+                <td colspan="6" class="text-right font-bold">Previous Month:</td>
+                <td class="text-left font-bold">{{ rtrim(rtrim(number_format($previousMonthNetLoss, 2, '.', ''), '0'), '.') }}</td>
             </tr>
 
             @php
@@ -51,19 +51,19 @@
                     <td>{{ $index + 1 }}</td>
                     <td>{{ \Carbon\Carbon::parse($record->date)->format('d/m/Y') }}</td>
                     <td>{{ $record->note }}</td>
-                    <td>{{ $record->sets }}</td>
-                    <td>{{ number_format($averageStampPricePerSet, 2) }}</td>
-                    <td>{{ number_format($totalPrice, 2) }}</td>
-                    <td>{{ number_format($cumulativeNetLoss, 2) }}</td>
+                    <td>{{ number_format($record->sets, 0) }}</td>
+                    <td>{{ rtrim(rtrim(number_format($averageStampPricePerSet, 2, '.', ''), '0'), '.') }}</td>
+                    <td>{{ rtrim(rtrim(number_format($totalPrice, 2, '.', ''), '0'), '.') }}</td>
+                    <td>{{ rtrim(rtrim(number_format($cumulativeNetLoss, 2, '.', ''), '0'), '.') }}</td>
                 </tr>
             @endforeach
 
             <tr>
-                <td colspan="3" class="text-right font-bold">Current Month's Totals:</td>
+                <td colspan="3" class="text-right font-bold">This Month:</td>
                 <td class="text-left font-bold">{{ number_format($rejectOrFreeRecords->sum('sets'), 0) }}</td>
                 <td></td>
                 <td></td>
-                <td class="text-left font-bold">{{ number_format($cumulativeNetLoss, 2) }}</td>
+                <td class="text-left font-bold">{{ rtrim(rtrim(number_format($cumulativeNetLoss, 2, '.', ''), '0'), '.') }}</td>
             </tr>
         </tbody>
     </table>

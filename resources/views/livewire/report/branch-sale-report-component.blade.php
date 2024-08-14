@@ -21,7 +21,6 @@
         </div>
     </div>
 
-
     <div class="overflow-x-auto">
         <table class="min-w-full bg-white border border-gray-300 rounded-lg shadow-md">
             <thead class="bg-blue-600 text-white border-b border-gray-300">
@@ -30,15 +29,16 @@
                     <th class="px-6 py-3 text-xs font-medium uppercase tracking-wider text-center">Date</th>
                     <th class="px-6 py-3 text-xs font-medium uppercase tracking-wider text-center">Sets</th>
                     <th class="px-6 py-3 text-xs font-medium uppercase tracking-wider text-center">Price</th>
+                    <th class="px-6 py-3 text-xs font-medium uppercase tracking-wider text-center">Previous Due</th>
                     <th class="px-6 py-3 text-xs font-medium uppercase tracking-wider text-center">Receive Cash</th>
                     <th class="px-6 py-3 text-xs font-medium uppercase tracking-wider text-center">Due</th>
                     <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Total Due</th>
                 </tr>
-            </thead>
+            </thead>            
             <tbody>
                 <tr class="bg-gray-100 border-b border-gray-200">
-                    <td class="px-6 py-4 text-sm font-medium text-gray-900" colspan="6">Due Before {{ $fromDate ?? 'the selected period' }}:</td>
-                    <td class="px-6 py-4 text-sm font-medium text-gray-900 text-right">{{ $soFarOutstanding }}</td>
+                    <td class="px-6 py-4 text-sm font-medium text-gray-900" colspan="7">Previous Due:</td>
+                    <td class="px-6 py-4 text-sm font-medium text-gray-900 text-right">{{ $soFarOutstanding % 1 === 0 ? number_format($soFarOutstanding, 0) : number_format($soFarOutstanding, 2) }}</td>
                 </tr>
 
                 @if($sales && $sales->isNotEmpty())
@@ -46,36 +46,36 @@
                         <tr class="{{ $loop->odd ? 'bg-white' : 'bg-gray-50' }} border-b border-gray-200">
                             <td class="px-6 py-4 text-sm font-medium text-gray-900">{{ $loop->iteration }}</td>
                             <td class="px-6 py-4 text-sm text-gray-900">{{ \Carbon\Carbon::parse($sale->date)->format('Y-m-d') }}</td>
-                            <td class="px-6 py-4 text-sm text-gray-900 text-center">{{ $sale->sets }}</td>
-                            <td class="px-6 py-4 text-sm text-gray-900 text-center">{{ $sale->total_price }}</td>
-                            <td class="px-6 py-4 text-sm text-gray-900 text-center">{{ $sale->cash }}</td>
+                            <td class="px-6 py-4 text-sm text-gray-900 text-center">{{ $sale->sets % 1 === 0 ? number_format($sale->sets, 0) : number_format($sale->sets, 2) }}</td>
+                            <td class="px-6 py-4 text-sm text-gray-900 text-center">{{ $sale->total_price % 1 === 0 ? number_format($sale->total_price, 0) : number_format($sale->total_price, 2) }}</td>
+                            <td class="px-6 py-4 text-sm text-gray-900 text-center">{{ $sale->previous_due % 1 === 0 ? number_format($sale->previous_due, 0) : number_format($sale->previous_due, 2) }}</td>
+                            <td class="px-6 py-4 text-sm text-gray-900 text-center">{{ $sale->cash % 1 === 0 ? number_format($sale->cash, 0) : number_format($sale->cash, 2) }}</td>
                             <td class="px-6 py-4 text-sm text-gray-900 text-center">
-                                {{ $sale->total_price - $sale->cash }}
+                                {{ ($sale->total_price - $sale->cash) % 1 === 0 ? number_format($sale->total_price - $sale->cash, 0) : number_format($sale->total_price - $sale->cash, 2) }}
                             </td>
-                            <td class="px-6 py-4 text-sm text-gray-900 text-right">{{ $sale->total_due }}</td>
+                            <td class="px-6 py-4 text-sm text-gray-900 text-right">{{ $sale->total_due % 1 === 0 ? number_format($sale->total_due, 0) : number_format($sale->total_due, 2) }}</td>
                         </tr>
                     @endforeach
                 @else
                     <tr>
-                        <td colspan="7" class="px-6 py-4 text-center text-sm text-gray-500">No sales data available for the selected period.</td>
+                        <td colspan="8" class="px-6 py-4 text-center text-sm text-gray-500">No sales data available for the selected period.</td>
                     </tr>
                 @endif
 
                 <!-- New Total Row -->
                 <tr class="bg-gray-200 border-t border-gray-300 font-bold">
                     <td class="px-6 py-4 text-sm text-right" colspan="2">Total: </td>
-                    <td class="px-6 py-4 text-sm text-center">{{ $totalSets }}</td>
-                    <td class="px-6 py-4 text-sm text-center">{{ $totalPrice }}</td>
-                    <td class="px-6 py-4 text-sm text-center">{{ $totalCash }}</td>
-                    <td class="px-6 py-4 text-sm text-center">{{ max($totalPrice - $totalCash, 0) }}</td>
-                    <td class="px-6 py-4 text-sm text-right">{{ $totalDue }}</td>
-                </tr>
+                    <td class="px-6 py-4 text-sm text-center">{{ $totalSets % 1 === 0 ? number_format($totalSets, 0) : number_format($totalSets, 2) }}</td>
+                    <td class="px-6 py-4 text-sm text-center">{{ $totalPrice % 1 === 0 ? number_format($totalPrice, 0) : number_format($totalPrice, 2) }}</td>
+                    <td class="px-6 py-4 text-sm text-center">{{ $soFarOutstanding % 1 === 0 ? number_format($soFarOutstanding, 0) : number_format($soFarOutstanding, 2) }}</td>
+                    <td class="px-6 py-4 text-sm text-center">{{ $totalCash % 1 === 0 ? number_format($totalCash, 0) : number_format($totalCash, 2) }}</td>
+                    <td class="px-6 py-4 text-sm text-center">{{ $totalDue % 1 === 0 ? number_format($totalDue, 0) : number_format($totalDue, 2) }}</td>
+                    <td class="px-6 py-4 text-sm text-right">{{ ($soFarOutstanding + $totalDue) % 1 === 0 ? number_format($soFarOutstanding + $totalDue, 0) : number_format($soFarOutstanding + $totalDue, 2) }}</td>
+                </tr>                
             </tbody>
         </table>
         <div class="mt-6 text-right">
             <button wire:click="downloadPdf" class="px-4 py-2 bg-blue-600 text-white font-semibold rounded-md shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">Download PDF</button>
         </div>
     </div>
-
-
 </div>

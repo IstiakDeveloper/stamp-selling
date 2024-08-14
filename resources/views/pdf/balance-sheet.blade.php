@@ -51,7 +51,7 @@
     </style>
 </head>
 <body>
-    <h1>Balance Sheet</h1>
+    <h1>Expenditure Sheet</h1>
 
     @php
         // Ensure month and year are integers
@@ -63,6 +63,11 @@
 
         // Format as "Month Year"
         $formattedDate = $date->format('F Y');
+
+        // Helper function to format numbers without trailing zeros
+        function formatNumber($number) {
+            return rtrim(rtrim(number_format($number, 2, '.', ''), '0'), '.');
+        }
     @endphp
 
     <p>{{ $formattedDate }}</p>
@@ -81,23 +86,23 @@
             <tbody>
                 <tr>
                     <td>Reject or Free (Total Purchase Price)</td>
-                    <td class="text-right">{{ number_format($rejectOrFreeSumMonth, 2) }}</td>
-                    <td class="text-right">{{ number_format($rejectOrFreeSumYear, 2) }}</td>
+                    <td class="text-right">{{ formatNumber($rejectOrFreeSumMonth) }}</td>
+                    <td class="text-right">{{ formatNumber($rejectOrFreeSumYear) }}</td>
                 </tr>
                 <tr>
                     <td>Expenses</td>
-                    <td class="text-right">{{ number_format($expenseSumMonth, 2) }}</td>
-                    <td class="text-right">{{ number_format($expenseSumYear, 2) }}</td>
+                    <td class="text-right">{{ formatNumber($expenseSumMonth) }}</td>
+                    <td class="text-right">{{ formatNumber($expenseSumYear) }}</td>
                 </tr>
-                <tr>
-                    <td>Sale Set Purchase Price</td>
-                    <td class="text-right">{{ number_format($saleStampBuyPriceMonth, 2) }}</td>
-                    <td class="text-right">{{ number_format($saleStampBuyPriceYear, 2) }}</td>
-                </tr>
+                {{-- <tr>
+                    <td></td>
+                    <td class="text-right">{{ formatNumber($saleStampBuyPriceMonth) }}</td>
+                    <td class="text-right">{{ formatNumber($saleStampBuyPriceYear) }}</td>
+                </tr> --}}
                 <tr class="bold-row">
                     <td>Total Loss</td>
-                    <td class="text-right">{{ number_format($totalLossMonth, 2) }}</td>
-                    <td class="text-right">{{ number_format($totalLossYear, 2) }}</td>
+                    <td class="text-right">{{ formatNumber($totalLossMonth) }}</td>
+                    <td class="text-right">{{ formatNumber($totalLossYear) }}</td>
                 </tr>
             </tbody>
         </table>
@@ -114,18 +119,18 @@
             <tbody>
                 <tr>
                     <td>Branch Sales (Total Price)</td>
-                    <td class="text-right">{{ number_format($branchSalePriceSumMonth, 2) }}</td>
-                    <td class="text-right">{{ number_format($branchSalePriceSumYear, 2) }}</td>
+                    <td class="text-right">{{ formatNumber($branchSalePriceSumMonth) }}</td>
+                    <td class="text-right">{{ formatNumber($branchSalePriceSumYear) }}</td>
                 </tr>
                 <tr>
                     <td>Head Office Sales (Total Price)</td>
-                    <td class="text-right">{{ number_format($headOfficeSalePriceSumMonth, 2) }}</td>
-                    <td class="text-right">{{ number_format($headOfficeSalePriceSumYear, 2) }}</td>
+                    <td class="text-right">{{ formatNumber($headOfficeSalePriceSumMonth) }}</td>
+                    <td class="text-right">{{ formatNumber($headOfficeSalePriceSumYear) }}</td>
                 </tr>
                 <tr class="bold-row">
                     <td>Total Sale</td>
-                    <td class="text-right">{{ number_format($totalRevenueMonth, 2) }}</td>
-                    <td class="text-right">{{ number_format($totalRevenueYear, 2) }}</td>
+                    <td class="text-right">{{ formatNumber($totalRevenueMonth) }}</td>
+                    <td class="text-right">{{ formatNumber($totalRevenueYear) }}</td>
                 </tr>
             </tbody>
         </table>
@@ -144,8 +149,8 @@
         <tbody>
             <tr class="bold-row">
                 <td>Net Profit</td>
-                <td class="text-right">{{ number_format($netProfitMonth, 2) }}</td>
-                <td class="text-right">{{ number_format($netProfitYear, 2) }}</td>
+                <td class="text-right">{{ formatNumber($netProfitMonth) }}</td>
+                <td class="text-right">{{ formatNumber($netProfitYear) }}</td>
             </tr>
         </tbody>
     </table>

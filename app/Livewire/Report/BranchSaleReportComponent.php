@@ -36,6 +36,8 @@ class BranchSaleReportComponent extends Component
         }
     }
 
+
+
     public function generateReport()
     {
         // Calculate the outstanding balance before the report period
@@ -77,11 +79,16 @@ class BranchSaleReportComponent extends Component
         $this->totalCash = $this->sales->sum('cash');
     
         foreach ($this->sales as $sale) {
+            $previousDue = $cumulativeDue;
+            
             // Update the cumulative due by adding the sale's price and subtracting the cash received
             $cumulativeDue += $sale->total_price - $sale->cash;
             
             // Assign the cumulative due to the sale's total_due attribute
             $sale->total_due = $cumulativeDue;
+            
+            // Store the previous due in a new attribute
+            $sale->previous_due = $previousDue;
         }
     
         // Calculate the final total due for the entire period
@@ -113,8 +120,17 @@ class BranchSaleReportComponent extends Component
         );
     }
 
+    public function calculateTotals()
+    {
+        $this->totalSets = $this->sales->sum('sets');
+        $this->totalPrice = $this->sales->sum('total_price');
+        $this->totalCash = $this->sales->sum('cash');
+        $this->totalDue = max($this->totalPrice - $this->totalCash, 0);
+    }
+
     public function render()
     {
+        $this->calculateTotals();
         $branches = Branch::all();
         return view('livewire.report.branch-sale-report-component', ['branches' => $branches]);
     }

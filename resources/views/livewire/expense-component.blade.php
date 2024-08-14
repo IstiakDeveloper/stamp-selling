@@ -52,7 +52,7 @@
                     @foreach ($expenses as $expense)
                         <tr class="hover:bg-gray-50">
                             <td class="px-6 py-4 whitespace-nowrap">{{ $expense->date }}</td>
-                            <td class="px-6 py-4 whitespace-nowrap">{{ number_format($expense->amount, 2) }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap">@formatNumber($expense->amount)</td>
                             <td class="px-6 py-4 whitespace-nowrap">{{ $expense->purpose }}</td>
                         </tr>
                     @endforeach

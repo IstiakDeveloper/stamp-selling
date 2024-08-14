@@ -15,12 +15,13 @@
         <table class="min-w-full bg-white border border-gray-300 rounded-lg shadow-md">
             <thead class="bg-blue-600 text-white">
                 <tr>
-                    <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider border-b border-gray-300">Serial Number</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider border-b border-gray-300">Branch Name</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider border-b border-gray-300">Sets</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider border-b border-gray-300">Price</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider border-b border-gray-300">Cash Receive</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider border-b border-gray-300">Total Due</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider border-b border-gray-300">SL</th>
+                    <th class="px-6 py-3 text-center text-xs font-medium uppercase tracking-wider border-b border-gray-300">Branch Name</th>
+                    <th class="px-6 py-3 text-center text-xs font-medium uppercase tracking-wider border-b border-gray-300">Previous Due</th>
+                    <th class="px-6 py-3 text-center text-xs font-medium uppercase tracking-wider border-b border-gray-300">Sets</th>
+                    <th class="px-6 py-3 text-center text-xs font-medium uppercase tracking-wider border-b border-gray-300">Price</th>
+                    <th class="px-6 py-3 text-center text-xs font-medium uppercase tracking-wider border-b border-gray-300">Cash Receive</th>
+                    <th class="px-6 py-3 text-right text-xs font-medium uppercase tracking-wider border-b border-gray-300">Total Due</th>
                 </tr>
             </thead>
             <tbody>
@@ -32,14 +33,22 @@
                     <tr class="{{ $hasValue ? 'bg-gray-100' : ($loop->odd ? 'bg-white' : '') }} border-b border-gray-200">
                         <td class="px-6 py-4 text-sm text-gray-900">{{ $loop->iteration }}</td>
                         <td class="px-6 py-4 text-sm text-gray-900 text-center">{{ $data['branch_name'] }}</td>
-                        <td class="px-6 py-4 text-sm text-gray-900 text-center">{{ $data['sets'] }}</td>
+                        <td class="px-6 py-4 text-sm text-gray-900 text-center">{{ $data['previous_outstanding'] }}</td>
+                        <td class="px-6 py-4 text-sm text-gray-900 text-center">
+                            @php
+                                $value = $data['sets'];
+                                // Format to two decimal places if needed
+                                $formattedValue = $value - floor($value) > 0 ? number_format($value, 2) : number_format($value, 0);
+                            @endphp
+                            {{ $formattedValue }}
+                        </td>
                         <td class="px-6 py-4 text-sm text-gray-900 text-center">{{ $data['price'] }}</td>
                         <td class="px-6 py-4 text-sm text-gray-900 text-center">{{ $data['cash'] }}</td>
-                        <td class="px-6 py-4 text-sm text-gray-900 text-center">{{ $data['total_due'] }}</td>
+                        <td class="px-6 py-4 text-sm text-gray-900 text-right">{{ $data['total_due'] }}</td>
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="6" class="px-6 py-4 text-center text-gray-900">No data available</td>
+                        <td colspan="7" class="px-6 py-4 text-center text-gray-900">No data available</td>
                     </tr>
                 @endforelse
             
@@ -47,10 +56,95 @@
                 <!-- Total Row -->
                 <tr class="bg-gray-200 font-bold border-t border-gray-300">
                     <td class="px-6 py-4 text-sm text-right" colspan="2">Total:</td>
+                    <td class="px-6 py-4 text-sm text-center">--</td> <!-- No total for Previous Due -->
                     <td class="px-6 py-4 text-sm text-center">{{ $totalSets }}</td>
                     <td class="px-6 py-4 text-sm text-center">{{ $totalPrice }}</td>
                     <td class="px-6 py-4 text-sm text-center">{{ $totalCash }}</td>
-                    <td class="px-6 py-4 text-sm text-center">{{ $totalDue }}</td>
+
+                    <td class="px-6 py-4 text-sm text-right">{{ $totalDue }}</td>
+                </tr>
+                <tr class="bg-green-200 font-bold border-t border-gray-300">
+                    <td class="px-6 py-4 text-sm text-right" colspan="2">Head Office Total:</td>
+                    <td class="px-6 py-4 text-sm text-center">--</td> <!-- No total for Previous Due -->
+                    <td class="px-6 py-4 text-sm text-center">
+                        @php
+                            $value = $hoSetsSum;
+                            // Format to two decimal places if needed
+                            $formattedValue = $value - floor($value) > 0 ? number_format($value, 2) : number_format($value, 0);
+                        @endphp
+                        {{ $formattedValue }}
+                    </td>
+                    <td class="px-6 py-4 text-sm text-center">
+                        @php
+                            $value = $hoTotalPriceSum;
+                            // Format to two decimal places if needed
+                            $formattedValue = $value - floor($value) > 0 ? number_format($value, 2) : number_format($value, 0);
+                        @endphp
+                        {{ $formattedValue }}
+                    </td>
+                    <td class="px-6 py-4 text-sm text-center">
+                        @php
+                            $value = $hoCashSum;
+                            // Format to two decimal places if needed
+                            $formattedValue = $value - floor($value) > 0 ? number_format($value, 2) : number_format($value, 0);
+                        @endphp
+                        {{ $formattedValue }}
+                    </td>
+
+                    <td class="px-6 py-4 text-sm text-right">0</td>
+                </tr>
+
+                <tr class="bg-blue-200 font-bold border-t border-gray-300">
+                    <td class="px-6 py-4 text-sm text-right" colspan="2">Reject or Free Total:</td>
+                    <td class="px-6 py-4 text-sm text-center">--</td> <!-- No total for Previous Due -->
+                    <td class="px-6 py-4 text-sm text-center">
+                        @php
+                            $value = $rfSetsSum;
+                            // Format to two decimal places if needed
+                            $formattedValue = $value - floor($value) > 0 ? number_format($value, 2) : number_format($value, 0);
+                        @endphp
+                        {{ $formattedValue }}
+                    </td>
+                    <td class="px-6 py-4 text-sm text-center">--</td>
+                    <td class="px-6 py-4 text-sm text-center">--</td>
+
+                    <td class="px-6 py-4 text-sm text-right">--</td>
+                </tr>
+                @php
+                  $grandTotalSets =  $totalSets + $hoSetsSum + $rfSetsSum;
+                  $grandTotalPrice = $totalPrice + $hoTotalPriceSum;
+                  $grandTotalCash = $totalCash + $hoCashSum;
+                @endphp
+
+                <tr class="bg-yellow-300 font-bold border-t border-gray-300">
+                    <td class="px-6 py-4 text-sm text-right" colspan="2">Grand Total:</td>
+                    <td class="px-6 py-4 text-sm text-center">--</td> <!-- No total for Previous Due -->
+                    <td class="px-6 py-4 text-sm text-center">
+                        @php
+                            $value = $grandTotalSets;
+                            // Format to two decimal places if needed
+                            $formattedValue = $value - floor($value) > 0 ? number_format($value, 2) : number_format($value, 0);
+                        @endphp
+                        {{ $formattedValue }}
+                    </td>
+                    <td class="px-6 py-4 text-sm text-center">
+                        @php
+                            $value = $grandTotalPrice;
+                            // Format to two decimal places if needed
+                            $formattedValue = $value - floor($value) > 0 ? number_format($value, 2) : number_format($value, 0);
+                        @endphp
+                        {{ $formattedValue }}
+                    </td>
+                    <td class="px-6 py-4 text-sm text-center">
+                        @php
+                            $value = $grandTotalCash;
+                            // Format to two decimal places if needed
+                            $formattedValue = $value - floor($value) > 0 ? number_format($value, 2) : number_format($value, 0);
+                        @endphp
+                        {{ $formattedValue }}
+                    </td>
+
+                    <td class="px-6 py-4 text-sm text-right">--</td>
                 </tr>
             </tbody>
         </table>

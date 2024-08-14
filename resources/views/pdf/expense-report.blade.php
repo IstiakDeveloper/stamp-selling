@@ -41,13 +41,13 @@
                 <th>Date</th>
                 <th>Purpose</th>
                 <th>Amount</th>
-                <th>Net Expense</th>
+                <th>Total Expense</th>
             </tr>
         </thead>
         <tbody>
             <tr>
-                <td colspan="4" class="text-right font-bold">Total Expenses Before Selected Month:</td>
-                <td class="font-bold">{{ number_format($previousMonthTotalExpenses, 2) }}</td>
+                <td colspan="4" class="text-right font-bold">Previous Expenses:</td>
+                <td class="font-bold">{{ rtrim(rtrim(number_format($previousMonthTotalExpenses, 2, '.', ''), '0'), '.') }}</td>
             </tr>
 
             @php
@@ -62,14 +62,14 @@
                     <td>{{ $index + 1 }}</td>
                     <td>{{ \Carbon\Carbon::parse($record->date)->format('d/m/Y') }}</td>
                     <td>{{ $record->purpose }}</td>
-                    <td>{{ number_format($record->amount, 2) }}</td>
-                    <td>{{ number_format($cumulativeNetExpense, 2) }}</td>
+                    <td>{{ rtrim(rtrim(number_format($record->amount, 2, '.', ''), '0'), '.') }}</td>
+                    <td>{{ rtrim(rtrim(number_format($cumulativeNetExpense, 2, '.', ''), '0'), '.') }}</td>
                 </tr>
             @endforeach
 
             <tr>
-                <td colspan="3" class="text-right font-bold">Total Amount for Current Month:</td>
-                <td class="font-bold">{{ number_format($totalAmount, 2) }}</td>
+                <td colspan="3" class="text-right font-bold">This Month:</td>
+                <td class="font-bold">{{ rtrim(rtrim(number_format($totalAmount, 2, '.', ''), '0'), '.') }}</td>
                 <td></td>
             </tr>
         </tbody>

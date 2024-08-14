@@ -19,7 +19,7 @@ class RejectOrFreeComponent extends Component
     protected $rules = [
         'date' => 'required|date_format:Y-m-d',
         'sets' => 'required|numeric|min:0.333',
-        'purchase_price_per_set' => 'required|numeric|min:0', // New validation rule
+        'purchase_price_per_set' => 'required|numeric|min:0',
         'note' => 'nullable|string',
     ];
 
@@ -35,7 +35,7 @@ class RejectOrFreeComponent extends Component
         }
     }
 
-public function calculatePurchasePricePerSet()
+    public function calculatePurchasePricePerSet()
     {
         $totalSets = Stock::sum('sets');
         $totalPrice = Stock::sum('total_price');
@@ -56,6 +56,21 @@ public function calculatePurchasePricePerSet()
         } else {
             $this->purchase_price_total = 0;
         }
+    }
+
+    public function formatNumber($number)
+    {
+        return number_format($number, 2, '.', '');
+    }
+
+    public function getFormattedPurchasePricePerSetProperty()
+    {
+        return $this->formatNumber($this->purchase_price_per_set);
+    }
+
+    public function getFormattedPurchasePriceTotalProperty()
+    {
+        return $this->formatNumber($this->purchase_price_total);
     }
 
     public function saveTransaction()
@@ -87,7 +102,7 @@ public function calculatePurchasePricePerSet()
     {
         $this->date = null;
         $this->sets = null;
-        $this->purchase_price_per_set = null; // Reset the new field
+        $this->purchase_price_per_set = null;
         $this->note = null;
     }
 

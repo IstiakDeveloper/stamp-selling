@@ -34,20 +34,29 @@
             <tr class="bg-gray-50">
                 <th class="border px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">SL</th>
                 <th class="border px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
-                <th class="border px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
-                <th class="border px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
                 <th class="border px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Note</th>
+                <th class="border px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
+                <th class="border px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fund In Amount</th>
+                <th class="border px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fund Out Amount</th>
                 <th class="border px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Available Balance</th>
             </tr>
         </thead>
         <tbody class="bg-white divide-y divide-gray-200">
             <tr class="bg-gray-100">
                 <td class="border px-4 py-2 text-sm text-gray-700">1</td>
-                <td class="border px-4 py-2 text-sm text-gray-700">Before {{ Carbon::create($year, $month, 1)->format('F Y') }}</td>
+                <td class="border px-4 py-2 text-sm text-gray-700">Previous: </td>
                 <td class="border px-4 py-2 text-sm text-gray-700"></td>
                 <td class="border px-4 py-2 text-sm text-gray-700"></td>
                 <td class="border px-4 py-2 text-sm text-gray-700"></td>
-                <td class="border px-4 py-2 text-sm font-semibold text-gray-900">{{ number_format($previousBalance, 2) }}</td>
+                <td class="border px-4 py-2 text-sm text-gray-700"></td>
+                <td class="border px-4 py-2 text-sm font-semibold text-gray-900">
+                    @php
+                        $formattedPreviousBalance = ($previousBalance == intval($previousBalance)) 
+                            ? number_format($previousBalance, 0) 
+                            : number_format($previousBalance, 2);
+                    @endphp
+                    {{ $formattedPreviousBalance }}
+                </td>
             </tr>
 
             @php
@@ -57,25 +66,33 @@
 
             @foreach($data as $entry)
                 @php
-                    $availableBalance += $entry->type === 'fund_in' ? $entry->amount : -$entry->amount;
+                    $fundInAmount = $entry->type === 'fund_in' ? $entry->amount : 0;
+                    $fundOutAmount = $entry->type === 'fund_out' ? $entry->amount : 0;
+                    $availableBalance += $fundInAmount - $fundOutAmount;
+
+                    // Format the amounts conditionally
+                    $formattedFundInAmount = ($fundInAmount == intval($fundInAmount)) 
+                        ? number_format($fundInAmount, 0) 
+                        : number_format($fundInAmount, 2);
+                    
+                    $formattedFundOutAmount = ($fundOutAmount == intval($fundOutAmount)) 
+                        ? number_format($fundOutAmount, 0) 
+                        : number_format($fundOutAmount, 2);
+
+                    $formattedAvailableBalance = ($availableBalance == intval($availableBalance)) 
+                        ? number_format($availableBalance, 0) 
+                        : number_format($availableBalance, 2);
                 @endphp
                 <tr>
                     <td class="border px-4 py-2 text-sm text-gray-700">{{ $index++ }}</td>
                     <td class="border px-4 py-2 text-sm text-gray-700">{{ Carbon::parse($entry->date)->format('Y-m-d') }}</td>
-                    <td class="border px-4 py-2 text-sm text-gray-700">{{ number_format($entry->amount, 2) }}</td>
-                    <td class="border px-4 py-2 text-sm text-gray-700">{{ ucfirst(str_replace('_', ' ', $entry->type)) }}</td>
                     <td class="border px-4 py-2 text-sm text-gray-700">{{ $entry->note }}</td>
-                    <td class="border px-4 py-2 text-sm font-semibold text-gray-900">{{ number_format($availableBalance, 2) }}</td>
+                    <td class="border px-4 py-2 text-sm text-gray-700">{{ ucfirst(str_replace('_', ' ', $entry->type)) }}</td>
+                    <td class="border px-4 py-2 text-sm text-gray-700">{{ $formattedFundInAmount }}</td>
+                    <td class="border px-4 py-2 text-sm text-gray-700">{{ $formattedFundOutAmount }}</td>
+                    <td class="border px-4 py-2 text-sm font-semibold text-gray-900">{{ $formattedAvailableBalance }}</td>
                 </tr>
             @endforeach
         </tbody>
     </table>
 </div>
-
-<script>
-    document.addEventListener('livewire:load', function () {
-        @this.on('pdfGenerated', url => {
-            window.open(url, '_blank');
-        });
-    });
-</script>

@@ -4,7 +4,12 @@
             <h2 class="text-2xl font-bold mb-4">Manage Stocks</h2>
         </div>
         <div>
-            <h2 class="text-lg mb-4 bg-blue-500 text-white rounded-lg py-2 px-4">Stock Available: {{$totalSet}} sets</h2>
+            <h2 class="text-lg mb-4 bg-blue-500 text-white rounded-lg py-2 px-4">Stock Available:                             @php
+                $value = $totalSet;
+                // Format to two decimal places if needed
+                $formattedValue = $value - floor($value) > 0 ? number_format($value, 2) : number_format($value, 0);
+            @endphp
+            {{ $formattedValue }} sets</h2>
         </div>
         {{-- <div>
             <h2 class="text-lg mb-4 bg-blue-500 text-white rounded-lg py-2 px-4">Stock Available: {{$totalPcs}} pieces</h2>
@@ -93,9 +98,16 @@
                     <tr class="border-b border-gray-200 hover:bg-gray-100">
                         <td class="py-3 px-6 text-left">{{ \Carbon\Carbon::parse($stock->date)->format('d/m/Y') }}</td>
                         <td class="py-3 px-6 text-left">{{ $stock->address }}</td>
-                        <td class="py-3 px-6 text-left">{{ $stock->sets }}</td>
-                        <td class="py-3 px-6 text-left">{{ number_format($stock->price_per_set, 2) }}</td>
-                        <td class="py-3 px-6 text-left">{{ number_format($stock->total_price, 2) }}</td>
+                        <td class="py-3 px-6 text-left">
+                            @php
+                                $value = $stock->sets;
+                                // Format to two decimal places if needed
+                                $formattedValue = $value - floor($value) > 0 ? number_format($value, 2) : number_format($value, 0);
+                            @endphp
+                            {{ $formattedValue }}
+                        </td>
+                        <td class="py-3 px-6 text-left">@formatNumber($stock->price_per_set)</td>
+                        <td class="py-3 px-6 text-left">@formatNumber($stock->total_price)</td>
                         <td class="py-3 px-6 text-left">{{ $stock->note }}</td>
                         <td class="py-3 px-6 text-center flex gap-2">
                             <button wire:click="edit({{ $stock->id }})" class="px-2 py-2 bg-blue-500 text-white rounded-md">Edit</button>

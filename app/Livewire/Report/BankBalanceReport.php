@@ -6,7 +6,7 @@ use App\Models\BranchSale;
 use App\Models\HeadOfficeSale;
 use App\Models\Money;
 use App\Models\Stock;
-use App\Models\Expense; // Import the Expense model
+use App\Models\Expense;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Carbon;
 use Livewire\Component;
@@ -20,13 +20,11 @@ class BankBalanceReport extends Component
     public $year;
     public $data;
     public $previousMonthData;
-    public $initialBalance;
 
     public function mount()
     {
         $this->month = Carbon::now()->month;
         $this->year = Carbon::now()->year;
-        $this->initialBalance = Money::where('type', 'cash_in')->sum('amount');
         $this->loadData();
     }
 
@@ -52,29 +50,37 @@ class BankBalanceReport extends Component
         // Data for all time before the selected month
         $endOfPreviousMonth = $startDate->copy()->subMonth()->endOfMonth();
         $allTimeBeforeSummary = [
-            'cash_receive' => 0,
+            'cash_in' => 0,
+            'cash_out' => 0,
             'purchase_sets' => 0,
             'purchase_price' => 0,
             'expenses' => 0
         ];
 
         // Calculate totals before the end of the previous month
-        $allTimeBeforeSummary['cash_receive'] = HeadOfficeSale::whereDate('date', '<=', $endOfPreviousMonth)
-            ->sum('cash') + BranchSale::whereDate('date', '<=', $endOfPreviousMonth)->sum('cash');
+        $allTimeBeforeSummary['cash_in'] = Money::where('type', 'cash_in')
+            ->whereDate('date', '<=', $endOfPreviousMonth)->sum('amount');
+        $allTimeBeforeSummary['cash_out'] = Money::where('type', 'cash_out')
+            ->whereDate('date', '<=', $endOfPreviousMonth)->sum('amount');
         $allTimeBeforeSummary['purchase_sets'] = Stock::whereDate('date', '<=', $endOfPreviousMonth)->sum('sets');
         $allTimeBeforeSummary['purchase_price'] = Stock::whereDate('date', '<=', $endOfPreviousMonth)->sum('total_price');
         $allTimeBeforeSummary['expenses'] = Expense::whereDate('date', '<=', $endOfPreviousMonth)->sum('amount');
+        $cashReceiveBefore = HeadOfficeSale::whereDate('date', '<=', $endOfPreviousMonth)->sum('cash')
+        + BranchSale::whereDate('date', '<=', $endOfPreviousMonth)->sum('cash');
 
-        $previousMonthBalance = $this->initialBalance
-            + $allTimeBeforeSummary['cash_receive']
+        $previousMonthBalance = $allTimeBeforeSummary['cash_in']
+            - $allTimeBeforeSummary['cash_out']
+            + $cashReceiveBefore
             - $allTimeBeforeSummary['purchase_price']
             - $allTimeBeforeSummary['expenses'];
 
         // Set the previous month data to be displayed in the view
         $this->previousMonthData = [
-            'cash_receive' => $allTimeBeforeSummary['cash_receive'],
+            'cash_in' => $allTimeBeforeSummary['cash_in'],
+            'cash_out' => $allTimeBeforeSummary['cash_out'],
             'purchase_sets' => $allTimeBeforeSummary['purchase_sets'],
             'purchase_price' => $allTimeBeforeSummary['purchase_price'],
+            'cash_receive' => $cashReceiveBefore,
             'expenses' => $allTimeBeforeSummary['expenses'],
             'balance' => $previousMonthBalance // Balance at the end of the previous month
         ];
@@ -83,21 +89,25 @@ class BankBalanceReport extends Component
         $currentMonthData = [];
         $balance = $previousMonthBalance; // Start with the end-of-previous-month balance
         foreach ($dates as $dateStr) {
+            $cashIn = Money::where('type', 'cash_in')->whereDate('date', $dateStr)->sum('amount');
+            $cashOut = Money::where('type', 'cash_out')->whereDate('date', $dateStr)->sum('amount');
             $cashReceive = HeadOfficeSale::whereDate('date', $dateStr)->sum('cash')
                 + BranchSale::whereDate('date', $dateStr)->sum('cash');
             $purchasePrice = Stock::whereDate('date', $dateStr)->sum('total_price');
             $purchaseSets = Stock::whereDate('date', $dateStr)->sum('sets');
-            $expenses = Expense::whereDate('date', $dateStr)->sum('amount'); // Calculate expenses for the date
+            $expenses = Expense::whereDate('date', $dateStr)->sum('amount');
 
             // Calculate available balance for this date
-            $balance += $cashReceive - $purchasePrice - $expenses;
+            $balance += $cashIn - $cashOut + $cashReceive - $purchasePrice - $expenses;
 
             $currentMonthData[] = [
                 'date' => $dateStr,
+                'cash_in' => $cashIn,
+                'cash_out' => $cashOut,
                 'cash_receive' => $cashReceive,
                 'purchase_sets' => $purchaseSets,
                 'purchase_price' => $purchasePrice,
-                'expenses' => $expenses, // Include expenses
+                'expenses' => $expenses,
                 'available_balance' => $balance,
             ];
         }
@@ -123,7 +133,6 @@ class BankBalanceReport extends Component
         $data = [
             'previousMonthData' => $this->previousMonthData,
             'data' => $this->data,
-            'initialBalance' => $this->initialBalance,
             'month' => $monthName,
             'year' => $year,
         ];
@@ -143,5 +152,4 @@ class BankBalanceReport extends Component
             ]
         );
     }
-
 }

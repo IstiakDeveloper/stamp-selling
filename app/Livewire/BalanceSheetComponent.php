@@ -74,13 +74,21 @@ class BalanceSheetComponent extends Component
         $rejectOrFreeSumMonth = RejectOrFree::whereBetween('date', [$startMonth, $endMonth])->sum('sets') * $this->getPurchasePriceSet();
         $expenseSumMonth = Expense::whereBetween('date', [$startMonth, $endMonth])->sum('amount');
         $branchSalePriceSumMonth = BranchSale::whereBetween('date', [$startMonth, $endMonth])->sum('total_price');
+
         $headOfficeSalePriceSumMonth = HeadOfficeSale::whereBetween('date', [$startMonth, $endMonth])->sum('total_price');
-        $saleStampBuyPriceMonth = (BranchSale::whereBetween('date', [$startMonth, $endMonth])->sum('sets') + HeadOfficeSale::whereBetween('date', [$startMonth, $endMonth])->sum('sets')) * $this->getPurchasePriceSet();
+
+
+        $saleSetBranchBuyPriceMonth = BranchSale::whereBetween('date', [$startMonth, $endMonth])->sum('sets') * $this->getPurchasePriceSet();
+        $saleSetHoBuyPriceMonth = HeadOfficeSale::whereBetween('date', [$startMonth, $endMonth])->sum('sets') * $this->getPurchasePriceSet();
+        $saleStampBuyPriceMonth = $saleSetBranchBuyPriceMonth  + $saleSetHoBuyPriceMonth;
+
+        $branchSalePriceSumMonth = $branchSalePriceSumMonth - $saleSetBranchBuyPriceMonth;
+        $headOfficeSalePriceSumMonth = $headOfficeSalePriceSumMonth - $saleSetHoBuyPriceMonth;
         
         // Calculate SofarNetProfit totals
         $sofarNetProfitSumMonth = SofarNetProfit::whereBetween('date', [$startMonth, $endMonth])->sum('amount');
 
-        $totalLossMonth = $rejectOrFreeSumMonth + $expenseSumMonth + $saleStampBuyPriceMonth;
+        $totalLossMonth = $rejectOrFreeSumMonth + $expenseSumMonth;
         $totalRevenueMonth = $branchSalePriceSumMonth + $headOfficeSalePriceSumMonth + $sofarNetProfitSumMonth;
         $netProfitMonth = $totalRevenueMonth - $totalLossMonth;
 
@@ -92,11 +100,18 @@ class BalanceSheetComponent extends Component
         $expenseSumYear = Expense::whereBetween('date', [$startYear, $endYear])->sum('amount');
         $branchSalePriceSumYear = BranchSale::whereBetween('date', [$startYear, $endYear])->sum('total_price');
         $headOfficeSalePriceSumYear = HeadOfficeSale::whereBetween('date', [$startYear, $endYear])->sum('total_price');
-        $saleStampBuyPriceYear = (BranchSale::whereBetween('date', [$startYear, $endYear])->sum('sets') + HeadOfficeSale::whereBetween('date', [$startYear, $endYear])->sum('sets')) * $this->getPurchasePriceSet();
+
+        $saleStampBranchBuyPriceYear = BranchSale::whereBetween('date', [$startYear, $endYear])->sum('sets') * $this->getPurchasePriceSet();
+        $saleStampHoBuyPriceYear =  HeadOfficeSale::whereBetween('date', [$startYear, $endYear])->sum('sets') * $this->getPurchasePriceSet();
+        $saleStampBuyPriceYear = $saleStampBranchBuyPriceYear + $saleStampHoBuyPriceYear;
         
+
+        $headOfficeSalePriceSumYear = $headOfficeSalePriceSumYear - $saleStampHoBuyPriceYear;
+        $branchSalePriceSumYear = $branchSalePriceSumYear - $saleStampBranchBuyPriceYear;
+
         $sofarNetProfitSumYear = SofarNetProfit::whereBetween('date', [$startYear, $endYear])->sum('amount');
 
-        $totalLossYear = $rejectOrFreeSumYear + $expenseSumYear + $saleStampBuyPriceYear;
+        $totalLossYear = $rejectOrFreeSumYear + $expenseSumYear;
         $totalRevenueYear = $branchSalePriceSumYear + $headOfficeSalePriceSumYear + $sofarNetProfitSumYear;
         $netProfitYear = $totalRevenueYear - $totalLossYear;
 
@@ -119,8 +134,8 @@ class BalanceSheetComponent extends Component
             'totalRevenueYear' => $totalRevenueYear,
             'netProfitMonth' => $netProfitMonth,
             'netProfitYear' => $netProfitYear,
-            'sofarNetProfitSumMonth' => $sofarNetProfitSumMonth, // Add this line
-            'sofarNetProfitSumYear' => $sofarNetProfitSumYear, // Add this line
+            'sofarNetProfitSumMonth' => $sofarNetProfitSumMonth,
+            'sofarNetProfitSumYear' => $sofarNetProfitSumYear,
         ];
     }
 

@@ -10,15 +10,27 @@ use Livewire\Component;
 
 class HeadOfficeSaleReportComponent extends Component
 {
-    public $selectedMonth;
+public $selectedMonth;
     public $selectedYear;
     public $soFarDue;
+    public $soFarSets;
+    public $soFarCash;
+    public $previousMonthDue;
 
     public function mount()
     {
         $this->selectedMonth = Carbon::now()->format('m');
         $this->selectedYear = Carbon::now()->format('Y');
         $this->calculateSoFarDue();
+        $this->calculatePreviousMonthDue();
+    }
+
+    public function updated($propertyName)
+    {
+        if ($propertyName === 'selectedMonth' || $propertyName === 'selectedYear') {
+            $this->calculateSoFarDue();
+            $this->calculatePreviousMonthDue();
+        }
     }
 
     public function render()
@@ -32,34 +44,42 @@ class HeadOfficeSaleReportComponent extends Component
         return view('livewire.report.head-office-sale-report-component', [
             'sales' => $sales,
             'completeMonth' => $completeMonth,
-            'soFarDue' => $this->soFarDue, // Passing $soFarDue to the view
-            'totalSetPrice' => $sales->sum('sets'), // Sum the total sets correctly
-            'totalPrice' => $sales->sum('price'), // Sum the total price correctly
-            'totalCashReceived' => $sales->sum('cash'), // Sum the total cash correctly
-            'totalDue' => $totalDue, // Sum the total due correctly, including soFarDue
+            'soFarDue' => $this->soFarDue,
+            'previousMonthDue' => $this->previousMonthDue,
+            'soFarSets' => $this->soFarSets,
+            'soFarCash' => $this->soFarCash,
+            'totalSetPrice' => $sales->sum('sets'),
+            'totalPrice' => $sales->sum('price'),
+            'totalCashReceived' => $sales->sum('cash'),
+            'totalDue' => $totalDue,
         ]);
     }
 
     private function calculateSoFarDue()
     {
-        // Get the start of the selected month
         $startOfMonth = Carbon::createFromDate($this->selectedYear, $this->selectedMonth, 1)->startOfMonth();
+        $endOfPreviousMonth = $startOfMonth->subDay(); // End of the previous month
 
-        // Sum the due_amount of all records before the start of the selected month
-        $this->soFarDue = HeadOfficeDue::where('date', '<', $startOfMonth)
-                                        ->sum('due_amount');
+        $this->soFarDue = HeadOfficeDue::where('date', '<=', $endOfPreviousMonth)->sum('due_amount');
+        $this->soFarSets = HeadOfficeSale::where('date', '<=', $endOfPreviousMonth)->sum('sets');
+        $this->soFarCash = HeadOfficeSale::where('date', '<=', $endOfPreviousMonth)->sum('cash');
     }
 
+    private function calculatePreviousMonthDue()
+    {
+        $previousMonth = Carbon::create($this->selectedYear, $this->selectedMonth, 1)->subMonth();
+        $startOfPreviousMonth = $previousMonth->startOfMonth();
+        $endOfPreviousMonth = $previousMonth->endOfMonth();
 
+        $this->previousMonthDue = HeadOfficeDue::whereBetween('date', [$startOfPreviousMonth, $endOfPreviousMonth])->sum('due_amount');
+    }
 
     private function getSalesData()
     {
-        // Retrieve sales data for the selected month and year
         $sales = HeadOfficeSale::whereYear('date', $this->selectedYear)
                                ->whereMonth('date', $this->selectedMonth)
                                ->get();
 
-        // Group sales by date and sum up the data for the same day
         return $sales->groupBy('date')->map(function ($salesOnDate) {
             $totalSets = $salesOnDate->sum('sets');
             $firstSale = $salesOnDate->first(); // Get the first sale of the day for the set price
@@ -70,7 +90,7 @@ class HeadOfficeSaleReportComponent extends Component
             return [
                 'date' => $firstSale->date,
                 'sets' => $totalSets,
-                'set_price' => $firstSale->per_set_price, // Use the set price from the first record
+                'set_price' => $firstSale->per_set_price,
                 'price' => $totalPrice,
                 'cash' => $totalCash,
                 'due' => $totalDue,
@@ -78,19 +98,20 @@ class HeadOfficeSaleReportComponent extends Component
         })->values();
     }
 
-
     public function downloadPdf()
     {
         $sales = $this->getSalesData();
         $completeMonth = $this->getCompleteMonth();
 
-        // Calculate the total due by adding the soFarDue to the sum of the due amounts from the sales data
         $totalDue = $this->soFarDue + $sales->sum('due');
 
         $data = [
             'sales' => $sales,
             'completeMonth' => $completeMonth,
             'soFarDue' => $this->soFarDue,
+            'soFarSets' => $this->soFarSets,
+            'soFarCash' => $this->soFarCash,
+            'previousMonthDue' => $this->previousMonthDue,
             'totalSetPrice' => $sales->sum('sets'),
             'totalPrice' => $sales->sum('price'),
             'totalCashReceived' => $sales->sum('cash'),
@@ -106,8 +127,6 @@ class HeadOfficeSaleReportComponent extends Component
             'head-office-sale-report-' . $this->selectedYear . '-' . $this->selectedMonth . '.pdf'
         );
     }
-
-
 
     private function getCompleteMonth()
     {

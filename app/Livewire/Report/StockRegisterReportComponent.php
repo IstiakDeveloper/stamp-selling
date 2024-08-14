@@ -125,6 +125,15 @@ class StockRegisterReportComponent extends Component
         $this->totalStockOutPrice = $stockOutData->sum('total_price');
         $this->averageStockOutPrice = $this->totalStockOut > 0 ? $this->totalStockOutPrice / $this->totalStockOut : 0;
 
+        $stockQuery = Stock::query();
+        $totalSetsBuy = $stockQuery->sum('sets');
+        $totalSetsBuyPrice = $stockQuery->sum('total_price');
+
+        if ($totalSetsBuy > 0) {
+            $averageStampPricePerSet = $totalSetsBuyPrice / $totalSetsBuy;
+        } else {
+            $averageStampPricePerSet = 0;
+        }
         // Calculate totals for before the selected month
         $this->soFarTotalStockIn = $this->soFarStockIn->sum('sets');
         $this->soFarTotalStockInPrice = $this->soFarStockIn->sum('total_purchase_price');
@@ -166,6 +175,7 @@ class StockRegisterReportComponent extends Component
             'cumulativeStockOut' => $this->cumulativeStockOut,
             'availableSets' => $this->availableSets,
             'cumulativeStockOutPrice' => $this->cumulativeStockOutPrice,
+            'averageStampPricePerSet' => $averageStampPricePerSet,
         ]);
     }
 
@@ -208,6 +218,15 @@ class StockRegisterReportComponent extends Component
         $cumulativeStockIn = $soFarStockIn->sum('sets') + $totalStockIn;
         $cumulativeStockOut = $soFarStockOut->sum('sets') + $totalStockOut;
         $availableSets = $cumulativeStockIn - $cumulativeStockOut;
+        $stockQuery = Stock::query();
+        $totalSetsBuy = $stockQuery->sum('sets');
+        $totalSetsBuyPrice = $stockQuery->sum('total_price');
+
+        if ($totalSetsBuy > 0) {
+            $averageStampPricePerSet = $totalSetsBuyPrice / $totalSetsBuy;
+        } else {
+            $averageStampPricePerSet = 0;
+        }
 
         // Prepare data to pass to the PDF view
         $data = [
@@ -225,6 +244,7 @@ class StockRegisterReportComponent extends Component
             'selectedYear' => $selectedYear,
             'selectedMonth' => $selectedMonth,
             'availableSets' => $availableSets, // Add available sets to data
+            'averageStampPricePerSet' => $averageStampPricePerSet,
         ];
 
         // Load the view and generate the PDF

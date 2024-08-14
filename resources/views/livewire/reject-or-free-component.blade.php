@@ -22,15 +22,21 @@
 
         <div>
             <label for="purchase_price_per_set" class="block text-sm font-medium text-gray-700">Purchase Price Per Set:</label>
-            <input type="number" step="any" wire:model.live="purchase_price_per_set" id="purchase_price_per_set" class="form-input mt-1 block w-full py-2 px-3 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" readonly>
+            <input type="text" readonly id="purchase_price_per_set" 
+                class="form-input mt-1 block w-full py-2 px-3 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" 
+                value="{{ $this->formatted_purchase_price_per_set }}">
             @error('purchase_price_per_set') <p class="text-red-500 text-xs italic mt-1">{{ $message }}</p> @enderror
         </div>
-
+        
         <div>
             <label for="purchase_price_total" class="block text-sm font-medium text-gray-700">Purchase Price Total:</label>
-            <input type="number" step="any" wire:model.live="purchase_price_total" id="purchase_price_total" class="form-input mt-1 block w-full py-2 px-3 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" readonly>
+            <input type="text" readonly id="purchase_price_total" 
+                class="form-input mt-1 block w-full py-2 px-3 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" 
+                value="{{ $this->formatted_purchase_price_total }}">
             @error('purchase_price_total') <p class="text-red-500 text-xs italic mt-1">{{ $message }}</p> @enderror
         </div>
+        
+        
 
         <div class="col-span-2">
             <label for="note" class="block text-sm font-medium text-gray-700">Note:</label>
@@ -65,9 +71,16 @@
                 @foreach ($rejectOrFrees as $rejectOrFree)
                     <tr class="hover:bg-gray-50">
                         <td class="px-6 py-4 whitespace-nowrap">{{ $rejectOrFree->date }}</td>
-                        <td class="px-6 py-4 whitespace-nowrap">{{ $rejectOrFree->sets }}</td>
-                        <td class="px-6 py-4 whitespace-nowrap">{{ number_format($rejectOrFree->purchase_price_per_set, 2) }}</td>
-                        <td class="px-6 py-4 whitespace-nowrap">{{ number_format($rejectOrFree->purchase_price_total, 2) }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            @php
+                                $value = $rejectOrFree->sets;
+                                // Format to two decimal places if needed
+                                $formattedValue = $value - floor($value) > 0 ? number_format($value, 2) : number_format($value, 0);
+                            @endphp
+                            {{ $formattedValue }}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">@formatNumber($rejectOrFree->purchase_price_per_set)</td>
+                        <td class="px-6 py-4 whitespace-nowrap">@formatNumber($rejectOrFree->purchase_price_total)</td>
                         <td class="px-6 py-4 whitespace-nowrap">{{ $rejectOrFree->note }}</td>
                     </tr>
                 @endforeach

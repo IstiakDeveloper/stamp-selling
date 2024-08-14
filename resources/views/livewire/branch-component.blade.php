@@ -52,7 +52,7 @@
                         <tr class="border-b hover:bg-gray-50">
                             <td class="py-3 px-6">{{ $branch->branch_code }}</td>
                             <td class="py-3 px-6">{{ $branch->branch_name }}</td>
-                            <td class="py-3 px-6">{{ number_format($branch->outstanding_balance, 2) }}</td>
+                            <td class="py-3 px-6">@formatNumber($branch->outstanding_balance)</td>
                             <td class="py-3 px-6 text-right">
                                 <button wire:click="edit({{ $branch->id }})" class="bg-yellow-500 text-white px-4 py-2 rounded-lg hover:bg-yellow-600 focus:outline-none focus:ring-2 focus:ring-yellow-500">Edit</button>
                                 <button wire:click="delete({{ $branch->id }})" class="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 ml-2">Delete</button>

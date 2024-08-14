@@ -30,7 +30,7 @@
             <label class="block text-sm font-medium text-gray-700">Total Price:</label>
             <span class="block text-lg font-semibold mt-1">
                 @if (!is_null($sets) && !is_null($per_stamp_price))
-                    {{ number_format($totalPrice, 2) }}
+                    @formatNumber($totalPrice)
                 @endif
             </span>
         </div>
@@ -68,7 +68,7 @@
                 <tr>
                     <th class="px-6 py-3 border-b border-gray-200 text-left">Date</th>
                     <th class="px-6 py-3 border-b border-gray-200 text-left">Sets</th>
-                    <th class="px-6 py-3 border-b border-gray-200 text-left">Per Stamp Price</th>
+                    <th class="px-6 py-3 border-b border-gray-200 text-left">Set Price</th>
                     <th class="px-6 py-3 border-b border-gray-200 text-left">Total Price</th>
                     <th class="px-6 py-3 border-b border-gray-200 text-left">Cash Received</th>
                     <th class="px-6 py-3 border-b border-gray-200 text-left">Due</th>
@@ -78,15 +78,21 @@
                 @foreach ($transactions as $transaction)
                     <tr class="border-b border-gray-200 hover:bg-gray-100">
                         <td class="px-6 py-4 whitespace-no-wrap">{{ $transaction->date }}</td>
-                        <td class="px-6 py-4 whitespace-no-wrap">{{ $transaction->sets }}</td>
-                        <td class="px-6 py-4 whitespace-no-wrap">{{ number_format($transaction->per_stamp_price, 2) }}</td>
-                        <td class="px-6 py-4 whitespace-no-wrap">{{ number_format($transaction->total_price, 2) }}</td>
-                        <td class="px-6 py-4 whitespace-no-wrap">{{ number_format($transaction->cash, 2) }}</td>
+                        <td class="px-6 py-4 whitespace-no-wrap">
+                            @php
+                                $value = $transaction->sets;
+                                // Format to two decimal places if needed
+                                $formattedValue = $value - floor($value) > 0 ? number_format($value, 2) : number_format($value, 0);
+                            @endphp
+                        </td>
+                        <td class="px-6 py-4 whitespace-no-wrap">@formatNumber($transaction->per_set_price)</td>
+                        <td class="px-6 py-4 whitespace-no-wrap">@formatNumber($transaction->total_price)</td>
+                        <td class="px-6 py-4 whitespace-no-wrap">@formatNumber($transaction->cash)</td>
                         <td class="px-6 py-4 whitespace-no-wrap">
                             @php
                                 $due = $transaction->headOfficeDue;
                             @endphp
-                            {{ $due ? number_format($due->due_amount, 2) : '0.00' }}
+                            {{ $due ? number_format($due->due_amount, 0) : '0.00' }}
                         </td>
                     </tr>
                 @endforeach

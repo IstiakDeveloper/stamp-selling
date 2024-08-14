@@ -19,6 +19,7 @@ class SetBranchPrice extends Component
         $this->price = BranchPrice::first()->price ?? 0; // Initialize with the first branch's price if available
     }
 
+    
     public function render()
     {
         return view('livewire.set-branch-price');
