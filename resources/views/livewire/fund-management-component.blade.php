@@ -5,7 +5,14 @@
         </div>
     @endif
 
-    <form wire:submit.prevent="submit">
+    <!-- Display Edit Form or Add New Form -->
+    @if ($editMode)
+        <h2 class="text-lg font-medium text-gray-900 mb-4">Edit Fund</h2>
+    @else
+        <h2 class="text-lg font-medium text-gray-900 mb-4">Add New Fund</h2>
+    @endif
+
+    <form wire:submit.prevent="{{ $editMode ? 'update' : 'submit' }}">
         <div class="mb-4">
             <label for="date" class="block text-sm font-medium text-gray-700">Date</label>
             <input type="date" id="date" wire:model="date" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50">
@@ -35,7 +42,7 @@
         </div>
 
         <button type="submit" class="w-full bg-indigo-600 text-white font-bold py-2 px-4 rounded hover:bg-indigo-700">
-            Submit
+            {{ $editMode ? 'Update' : 'Submit' }}
         </button>
     </form>
 
@@ -44,7 +51,37 @@
             <h3 class="text-lg font-medium text-gray-900">Total Fund: @formatNumber($totalFund)</h3>
         </div>
         <div>
-            <a class="bg-indigo-600 text-white font-bold py-2 px-4 rounded hover:bg-indigo-700" href="{{route('fund_management_report')}}">View Report</a>
+            <a class="bg-indigo-600 text-white font-bold py-2 px-4 rounded hover:bg-indigo-700" href="{{ route('fund_management_report') }}">View Report</a>
         </div>
+    </div>
+
+    <div class="mt-6">
+        <h2 class="text-lg font-medium text-gray-900 mb-4">Fund Management List</h2>
+
+        <table class="min-w-full bg-white">
+            <thead>
+                <tr>
+                    <th class="py-2">Date</th>
+                    <th class="py-2">Amount</th>
+                    <th class="py-2">Type</th>
+                    <th class="py-2">Note</th>
+                    <th class="py-2">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach($funds as $fund)
+                <tr class="border-b">
+                    <td class="py-2">{{ $fund->date }}</td>
+                    <td class="py-2">@formatNumber($fund->amount)</td>
+                    <td class="py-2">{{ ucfirst(str_replace('_', ' ', $fund->type)) }}</td>
+                    <td class="py-2">{{ $fund->note }}</td>
+                    <td class="py-2">
+                        <button wire:click="edit('{{ $fund->id }}')" class="text-blue-600 hover:underline">Edit</button>
+                        <button wire:click="delete('{{ $fund->id }}')" class="text-red-600 hover:underline">Delete</button>
+                    </td>
+                </tr>
+                @endforeach
+            </tbody>
+        </table>
     </div>
 </div>

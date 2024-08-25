@@ -24,7 +24,12 @@
     </div>
 
     <div class="mb-4">
-        <h3 class="text-lg font-medium text-gray-700">Total: {{ number_format($totalStockSum, 2) }}</h3>
+        <h3 class="text-lg font-medium text-gray-700">Total: @php
+            $value = $totalStockSum;
+            // Format to two decimal places if needed
+            $formattedValue = $value - floor($value) > 0 ? number_format($value, 2) : number_format($value, 0);
+        @endphp
+        {{ $formattedValue }}</h3>
     </div>
 
     <div class="overflow-x-auto">
@@ -34,7 +39,7 @@
                     <th class="py-2 px-4 border-b border-gray-200 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
                     <th class="py-2 px-4 border-b border-gray-200 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Address</th>
                     <th class="py-2 px-4 border-b border-gray-200 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Sets</th>
-                    <th class="py-2 px-4 border-b border-gray-200 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Pieces</th>
+                    {{-- <th class="py-2 px-4 border-b border-gray-200 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Pieces</th> --}}
                     <th class="py-2 px-4 border-b border-gray-200 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Price Per Set</th>
                     <th class="py-2 px-4 border-b border-gray-200 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total Price</th>
                 </tr>
@@ -44,10 +49,17 @@
                     <tr>
                         <td class="py-2 px-4 border-b border-gray-200">{{ $stock->date }}</td>
                         <td class="py-2 px-4 border-b border-gray-200">{{ $stock->address }}</td>
-                        <td class="py-2 px-4 border-b border-gray-200">{{ $stock->sets }}</td>
-                        <td class="py-2 px-4 border-b border-gray-200">{{ $stock->pieces }}</td>
-                        <td class="py-2 px-4 border-b border-gray-200">{{ $stock->price_per_set }}</td>
-                        <td class="py-2 px-4 border-b border-gray-200">{{ $stock->total_price }}</td>
+                        <td class="py-2 px-4 border-b border-gray-200">
+                            @php
+                            $value = $stock->sets ;
+                            // Format to two decimal places if needed
+                            $formattedValue = $value - floor($value) > 0 ? number_format($value, 2) : number_format($value, 0);
+                        @endphp
+                        {{ $formattedValue }}
+            </td>
+                        {{-- <td class="py-2 px-4 border-b border-gray-200">{{ $stock->pieces }}</td> --}}
+                        <td class="py-2 px-4 border-b border-gray-200">@formatNumber($stock->price_per_set)</td>
+                        <td class="py-2 px-4 border-b border-gray-200">@formatNumber($stock->total_price)</td>
                     </tr>
                 @endforeach
             </tbody>

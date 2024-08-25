@@ -65,6 +65,7 @@
                     <th class="px-6 py-3 text-left">Purchase Price Per Set</th>
                     <th class="px-6 py-3 text-left">Reject Price Total</th>
                     <th class="px-6 py-3 text-left">Note</th>
+                    <th class="px-6 py-3 text-left">Action</th>
                 </tr>
             </thead>
             <tbody class="bg-white text-sm font-light divide-y divide-gray-200">
@@ -82,6 +83,12 @@
                         <td class="px-6 py-4 whitespace-nowrap">@formatNumber($rejectOrFree->purchase_price_per_set)</td>
                         <td class="px-6 py-4 whitespace-nowrap">@formatNumber($rejectOrFree->purchase_price_total)</td>
                         <td class="px-6 py-4 whitespace-nowrap">{{ $rejectOrFree->note }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <button class="bg-red-500 py-2 px-4 hover:bg-red-700 text-white rounded" wire:click="deleteTransaction({{ $rejectOrFree->id }})">
+            
+                                Delete
+                            </button>
+                        </td>
                     </tr>
                 @endforeach
             </tbody>

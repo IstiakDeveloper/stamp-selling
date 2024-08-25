@@ -28,6 +28,7 @@ class HeadOfficeSaleComponent extends Component
         'note' => 'nullable|string', // Validate note as optional
     ];
 
+
     public function mount()
     {
         $this->date = Carbon::today()->format('Y-m-d');
@@ -143,6 +144,36 @@ class HeadOfficeSaleComponent extends Component
         // Reset input fields
         $this->resetInputFields();
     }
+
+
+
+    public function deleteSale($saleId)
+    {
+        // Find the sale record
+        $sale = HeadOfficeSale::findOrFail($saleId);
+
+        // Adjust the balance by subtracting the cash amount of the sale
+        $balance = Balance::first();
+        $balance->update(['total_balance' => $balance->total_balance - $sale->cash]);
+
+        // Check and remove any associated due records
+        if ($sale->headOfficeDue) {
+            $sale->headOfficeDue->delete();
+        }
+
+        // Remove the sale record
+        $sale->delete();
+
+        // Recalculate total stock (if necessary)
+        $piecesSold = $sale->sets * 3;
+        $totalStock = TotalStock::find(1);
+        $totalStock->increment('total_sets', $sale->sets);
+        $totalStock->increment('total_pieces', $piecesSold);
+
+        // Show a success message
+        sweetalert()->success('Sale record deleted successfully');
+    }
+
 
 
     private function resetInputFields()

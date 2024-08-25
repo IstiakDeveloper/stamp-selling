@@ -32,9 +32,9 @@
                 <!-- So Far Totals Before Selected Month -->
                 <tr class="bg-green-200 font-bold">
                     <td class="px-6 py-4 border-b border-gray-300">Previous {{ \Carbon\Carbon::createFromDate($selectedYear, $selectedMonth)->format('F') }}:</td>
-                    <td class="px-6 py-4 border-b border-gray-300 text-center">@formatPrice($soFarStockIn->sum('sets'))</td>
-                    <td class="px-6 py-4 border-b border-gray-300 text-center">@formatPrice($soFarStockOut->sum('sets'))</td>
-                    <td class="px-6 py-4 border-b border-gray-300 text-right">@formatPrice($soFarStockIn->sum('sets') - $soFarStockOut->sum('sets'))</td>
+                    <td class="px-6 py-4 border-b border-gray-300 text-center">@formatNumber($soFarStockIn->sum('sets'))</td>
+                    <td class="px-6 py-4 border-b border-gray-300 text-center">@formatNumber($soFarStockOut->sum('sets'))</td>
+                    <td class="px-6 py-4 border-b border-gray-300 text-right">@formatNumber($soFarStockIn->sum('sets') - $soFarStockOut->sum('sets'))</td>
                 </tr>
 
                 <!-- Daily Stock In/Out Data -->
@@ -61,32 +61,32 @@
                     <tr class="{{ $isDataAvailable ? 'bg-gray-200' : '' }}">
                         <td class="px-6 py-4 border-b border-gray-300">{{ $day->format('d/m/Y') }}</td>
                         <td class="px-6 py-4 border-b border-gray-300 text-center">{{ ($dayStockInData['sets']) % 1 === 0 ? number_format(($dayStockInData['sets']), 0) : number_format(($dayStockInData['sets']), 2) }}</td>
-                        <td class="px-6 py-4 border-b border-gray-300 text-center">@formatPrice($dayStockOutData['sets'])</td>
-                        <td class="px-6 py-4 border-b border-gray-300 text-right">@formatPrice($availableSets)</td>
+                        <td class="px-6 py-4 border-b border-gray-300 text-center">@formatNumber($dayStockOutData['sets'])</td>
+                        <td class="px-6 py-4 border-b border-gray-300 text-right">@formatNumber($availableSets)</td>
                     </tr>
                 @endforeach
 
                 <!-- Monthly Totals -->
                 <tr class="bg-blue-200 font-bold">
                     <td class="py-4 px-6 border-b border-gray-300">This Month Total:</td>
-                    <td class="px-6 py-4 border-b border-gray-300 text-center">@formatPrice($totalStockIn)</td>
-                    <td class="px-6 py-4 border-b border-gray-300 text-center">@formatPrice($totalStockOut)</td>
-                    <td class="px-6 py-4 border-b border-gray-300 text-right">@formatPrice($availableSets)</td>
+                    <td class="px-6 py-4 border-b border-gray-300 text-center">@formatNumber($totalStockIn)</td>
+                    <td class="px-6 py-4 border-b border-gray-300 text-center">@formatNumber($totalStockOut)</td>
+                    <td class="px-6 py-4 border-b border-gray-300 text-right">@formatNumber($availableSets)</td>
                 </tr>
 
                 <!-- Cumulative Totals -->
                 <tr class="bg-green-200 font-bold">
                     <td class="py-4 px-6 border-b border-gray-300">Total:</td>
-                    <td class="px-6 py-4 border-b border-gray-300 text-center">@formatPrice($soFarStockIn->sum('sets') + $totalStockIn)</td>
-                    <td class="px-6 py-4 border-b border-gray-300 text-center">@formatPrice($soFarStockOut->sum('sets') + $totalStockOut)</td>
-                    <td class="px-6 py-4 border-b border-gray-300 text-right">@formatPrice($availableSets)</td>
+                    <td class="px-6 py-4 border-b border-gray-300 text-center">@formatNumber($soFarStockIn->sum('sets') + $totalStockIn)</td>
+                    <td class="px-6 py-4 border-b border-gray-300 text-center">@formatNumber($soFarStockOut->sum('sets') + $totalStockOut)</td>
+                    <td class="px-6 py-4 border-b border-gray-300 text-right">@formatNumber($availableSets)</td>
                 </tr>
 
                 <tr class="bg-green-200 font-bold">
                     <td class="py-4 px-6 border-b border-gray-300">Available Stock Price:</td>
                     <td></td>
                     <td></td>
-                    <td class="px-6 py-4 border-b bg-yellow-300 border-gray-300 text-right">@formatPrice($availableSets * $averageStampPricePerSet)</td>
+                    <td class="px-6 py-4 border-b bg-yellow-300 border-gray-300 text-right">@formatNumber($availableSets * $averageStampPricePerSet)</td>
                 </tr>
             </tbody>
         </table>

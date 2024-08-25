@@ -198,6 +198,7 @@ class BranchSaleComponent extends Component
         // Reset input fields
         $this->resetInputFields();
     }
+
     
 
     private function resetInputFields()
@@ -209,6 +210,46 @@ class BranchSaleComponent extends Component
         $this->totalPrice = null;
         $this->cash = null;
     }
+
+
+    public function deleteSale($branchSaleId)
+    {
+        // Begin transaction to ensure data consistency
+        \DB::transaction(function () use ($branchSaleId) {
+            // Retrieve the BranchSale record
+            $branchSale = BranchSale::findOrFail($branchSaleId);
+    
+            // Retrieve the associated Payment record, if it exists
+            $payment = Payment::where('branch_id', $branchSale->branch_id)
+                              ->where('date', $branchSale->date)
+                              ->first();
+    
+            // Reverse the stock update
+            $piecesSold = $branchSale->sets * 3;
+            $totalStock = TotalStock::find(1); // Assuming you want to update the row with id = 1
+            $totalStock->increment('total_sets', $branchSale->sets);
+            $totalStock->increment('total_pieces', $piecesSold);
+    
+            // Reverse the balance update if the payment exists
+            $balance = Balance::first();
+            $balance->update(['total_balance' => $balance->total_balance - $branchSale->cash]);
+    
+            // Delete BranchOutstanding record
+            BranchSaleOutstanding::where('branch_sale_id', $branchSale->id)->delete();
+    
+            // Delete OutstandingBalanceHistory record
+            OutstandingBalanceHistory::where('branch_id', $branchSale->branch_id)
+                ->where('date', $branchSale->date)
+                ->delete();
+    
+            // Delete the BranchSale record
+            $branchSale->delete();
+    
+            // Optionally, send a success flash message
+            flash()->success('Sale and all related data have been successfully deleted.');
+        });
+    }
+    
 
     private function getBranchPrice()
     {

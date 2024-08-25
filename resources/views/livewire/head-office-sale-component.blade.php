@@ -72,6 +72,7 @@
                     <th class="px-6 py-3 border-b border-gray-200 text-left">Total Price</th>
                     <th class="px-6 py-3 border-b border-gray-200 text-left">Cash Received</th>
                     <th class="px-6 py-3 border-b border-gray-200 text-left">Due</th>
+                    <th class="px-6 py-3 border-b border-gray-200 text-left">Action</th>
                 </tr>
             </thead>
             <tbody class="text-gray-600 text-sm font-light">
@@ -93,6 +94,13 @@
                                 $due = $transaction->headOfficeDue;
                             @endphp
                             {{ $due ? number_format($due->due_amount, 0) : '0.00' }}
+                        </td>
+                        <td class="px-6 py-4 whitespace-no-wrap">
+                            <!-- Delete button -->
+                            <button wire:click="deleteSale({{ $transaction->id }})"
+                                    class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
+                                Delete
+                            </button>
                         </td>
                     </tr>
                 @endforeach

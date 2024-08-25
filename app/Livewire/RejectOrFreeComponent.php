@@ -106,6 +106,25 @@ class RejectOrFreeComponent extends Component
         $this->note = null;
     }
 
+
+    public function deleteTransaction($id)
+    {
+        // Find the record by its ID
+        $rejectOrFree = RejectOrFree::findOrFail($id);
+
+        // Increase stock by the number of sets (reverse the operation done in saveTransaction)
+        $piecesToAdd = $rejectOrFree->sets * 3; // Assuming 1 set = 3 pcs
+        $totalStock = TotalStock::first();
+
+        $totalStock->increment('total_sets', $rejectOrFree->sets);
+        $totalStock->increment('total_pieces', $piecesToAdd);
+
+        // Delete the record
+        $rejectOrFree->delete();
+
+        sweetalert()->success('Reject or free transaction deleted successfully.');
+    }
+
     public function render()
     {
         $rejectOrFrees = RejectOrFree::latest()->get();

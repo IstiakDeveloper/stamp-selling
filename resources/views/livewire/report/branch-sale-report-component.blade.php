@@ -70,8 +70,12 @@
                     <td class="px-6 py-4 text-sm text-center">{{ $soFarOutstanding % 1 === 0 ? number_format($soFarOutstanding, 0) : number_format($soFarOutstanding, 2) }}</td>
                     <td class="px-6 py-4 text-sm text-center">{{ $totalCash % 1 === 0 ? number_format($totalCash, 0) : number_format($totalCash, 2) }}</td>
                     <td class="px-6 py-4 text-sm text-center">{{ $totalDue % 1 === 0 ? number_format($totalDue, 0) : number_format($totalDue, 2) }}</td>
-                    <td class="px-6 py-4 text-sm text-right">{{ ($soFarOutstanding + $totalDue) % 1 === 0 ? number_format($soFarOutstanding + $totalDue, 0) : number_format($soFarOutstanding + $totalDue, 2) }}</td>
-                </tr>                
+                    @php
+                        $lastSaleTotalDue = $sales->isNotEmpty() ? $sales->last()->total_due : 0;
+                    @endphp
+                    <td class="px-6 py-4 text-sm text-right">
+                        {{ $lastSaleTotalDue % 1 === 0 ? number_format($lastSaleTotalDue, 0) : number_format($lastSaleTotalDue, 2) }}
+                    </td>                </tr>                
             </tbody>
         </table>
         <div class="mt-6 text-right">

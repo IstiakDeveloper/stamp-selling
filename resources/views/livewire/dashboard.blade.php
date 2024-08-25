@@ -140,7 +140,15 @@
         <div class="bg-white shadow-md rounded-lg p-6 flex items-center justify-between mt-4">
             <div>
                 <span class="text-gray-400 text-sm">Total Rejects</span>
-                <h2 class="text-2xl font-bold">{{ $rejectTotal }}</h2>
+                <h2 class="text-2xl font-bold">
+                    @php
+                        $value = $rejectTotal;
+                        // Format to two decimal places if needed
+                        $formattedValue = $value - floor($value) > 0 ? number_format($value, 2) : number_format($value, 0);
+                    @endphp
+                    {{ $formattedValue }}
+                </h2>
+
             </div>
             <x-lucide-ban class="text-blue-500 h-10 w-10" />
         </div>

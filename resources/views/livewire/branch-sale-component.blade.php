@@ -90,6 +90,7 @@
                     <th class="px-6 py-3 border-b border-gray-200 text-left">Per Set Price</th>
                     <th class="px-6 py-3 border-b border-gray-200 text-left">Total Price</th>
                     <th class="px-6 py-3 border-b border-gray-200 text-left">Cash Received</th>
+                    <th class="px-6 py-3 border-b border-gray-200 text-left">Action</th>
                 </tr>
             </thead>
             <tbody class="text-gray-600 text-sm font-light">
@@ -108,6 +109,11 @@
                         <td class="px-6 py-4 whitespace-nowrap">@formatNumber($transaction->per_set_price)</td>
                         <td class="px-6 py-4 whitespace-nowrap">@formatNumber($transaction->total_price)</td>
                         <td class="px-6 py-4 whitespace-nowrap">@formatNumber($transaction->cash)</td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <button wire:click="deleteSale({{ $transaction->id }})" class="bg-red-500 text-white px-4 py-2 rounded">
+                                Delete Sale
+                            </button>
+                        </td>
                     </tr>
                 @endforeach
             </tbody>
